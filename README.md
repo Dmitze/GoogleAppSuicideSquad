@@ -43,9 +43,6 @@ Contains core configuration and setup logic.
 Defines constants like sheet names, important ranges, and color codes.
 backupLogSheet.gs
 profile
-Qwen3-235B-A22B
-11:25 am
-Отлично! Теперь, когда я вижу структуру ваших файлов и кода, я могу улучшить описание проекта на GitHub. Я буду писать описание на английском , а комментарии для вас (на русском) будут помечены как "💡 Примечание" .
 
 🎯 GoogleAppSuicideSquad
 A powerful Google Apps Script automation tool for tracking changes in Google Sheets , logging activity history, and exporting data to reports — all integrated with Google Drive . 
@@ -90,9 +87,6 @@ Here’s an overview of the files in your project:
 Contains core configuration and setup logic.
 Defines constants like sheet names, important ranges, and color codes.
 profile
-Qwen3-235B-A22B
-11:25 am
-Отлично! Теперь, когда я вижу структуру ваших файлов и кода, я могу улучшить описание проекта на GitHub. Я буду писать описание на английском , а комментарии для вас (на русском) будут помечены как "💡 Примечание" .
 
 🎯 GoogleAppSuicideSquad
 A powerful Google Apps Script automation tool for tracking changes in Google Sheets , logging activity history, and exporting data to reports — all integrated with Google Drive . 
