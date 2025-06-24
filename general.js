@@ -1,5 +1,4 @@
 /**
- * === Налаштування ===
  * Всі кеші, тимчасові таблиці, експортовані логи, історії та архіви зберігаються у спеціальній папці Google Drive
  */
 
@@ -34,32 +33,63 @@ function showLogsRestoreDialog() {
 // === Меню при відкритті файлу ===
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
-  const menu = ui.createMenu("Дії з таблицею")
-    .addItem("Скласти звіт у Word...", "showWordExportFullForm")
-    .addItem("Експортувати до Word...", "showExportToWordDialog")
-    .addItem("Експортувати до Word", "exportSheetRangeToWord")
-    .addItem("Ручна перевірка змін", "checkChanges")
-    .addItem("Звіт по діям користувачів", "showUsersActionReport")
-    .addSeparator()
-    .addItem("Перевірити орфографію/формати", "runValidation")
-    // Нові пункти: експорт і архівація логів
-    .addItem("Експорт логу у Excel", "exportLogSheetAsExcel")
-    .addItem("Експорт логу у CSV", "exportLogSheetAsCSV")
-    .addItem("Експорт історії у CSV", "exportHistoryToCSV") // ← Новый экспорт всей истории
-    .addItem("Архівація логів", "archiveLogHistory")
-    .addItem("Створити тригер на архівацію", "createDailyArchiveTrigger")
-    .addItem("Видалити старі бекапи", "cleanupOldBackups");
 
-  menu.addToUi();
+  // === 1. Меню "🛠 Дії з таблицею" ===
+  const mainMenu = ui.createMenu("🛠 Дії з таблицею")
+    .addItem("📱 Згенерувати QR-коди з усіма даними", "generateFullInfoQRCodesForSheet")
+    .addItem("🔍 Гнучка генерація ключів", "generateKeysWithCustomColumns")
+    .addItem("📱 Згенерувати QR-коди за Постійним ID", "generateQRCodesForSheet")
+    .addItem("📁 Експортувати товари з ключами (CSV)", "exportProductsWithKeysToCSV");
+
+  // === 2. Меню "📏 Форматування" ===
+  const formattingMenu = ui.createMenu("📏 Форматування")
+    .addItem("📐 Вирівняти висоту рядків", "showSidebar");
+
+  // === 3. Меню "📄 Експорт до Word" ===
+  const wordExportMenu = ui.createMenu("📄 Експорт до Word")
+    .addItem("📑 Скласти звіт у Word...", "showWordExportFullForm")
+    .addItem("📘 Експортувати до Word...", "showExportToWordDialog")
+    .addItem("📖 Експортувати виділений діапазон до Word", "exportSheetRangeToWord");
+
+  // === 4. Меню "🕵️‍♂️ Перевірка та логи" ===
+  const validationMenu = ui.createMenu("🕵️‍♂️ Перевірка та логи")
+    .addItem("🔧 Ручна перевірка змін", "checkChanges")
+    .addItem("📊 Звіт по діям користувачів", "showUsersActionReport")
+    .addItem("🔍 Перевірити орфографію/формати", "runValidation");
+
+  // === 5. Меню "📦 Логи та архівація" ===
+  const logMenu = ui.createMenu("📦 Логи та архівація")
+    .addItem("📥 Експорт логу у Excel", "exportLogSheetAsExcel")
+    .addItem("📤 Експорт логу у CSV", "exportLogSheetAsCSV")
+    .addItem("📜 Експорт історії у CSV", "exportHistoryToCSV")
+    .addItem("🗃 Архівація логів", "archiveLogHistory")
+    .addItem("⏰ Створити тригер на архівацію", "createDailyArchiveTrigger")
+    .addItem("🗑 Видалити старі бекапи", "cleanupOldBackups");
+
+  // === 6. Додавання підменю "🔍 Пошук і історія" ===
+  const searchMenu = ui.createMenu("🔍 Пошук і історія")
+    .addItem("🔎 Додати пункт 'Пошук' в головне меню", "addHistorySearchMenu");
+
+  // === Додавання всіх меню до головного UI ===
+  ui.createMenu("📋 Головне меню")
+    .addSubMenu(mainMenu)
+    .addSubMenu(formattingMenu)
+    .addSubMenu(wordExportMenu)
+    .addSubMenu(validationMenu)
+    .addSubMenu(logMenu)
+    .addSubMenu(searchMenu)
+    .addToUi();
 
   setupLogSheet();
-
-  // Додаткове меню для пошуку
-  addHistorySearchMenu();
 }
 
 
-// === Основна перевірка змін (залишаємо як є) ===
+// Відкриває бокову панель
+function showSidebar() {
+  const html = HtmlService.createHtmlOutputFromFile("Sidebar").setTitle("Вирівняти строки");
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
 function checkChanges() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const props = PropertiesService.getScriptProperties();
