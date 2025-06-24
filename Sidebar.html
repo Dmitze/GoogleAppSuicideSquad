@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+    }
+    input[type="number"] {
+      width: 80px;
+      margin: 10px 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Вирівняти висоту рядків</h2>
+<p>Введіть бажану висоту:</p>
+<input type="number" id="rowHeightInput" placeholder="Наприклад: 21" />
+<br/><br/>
+<button onclick="applyHeight()">Застосувати</button>
+
+<script>
+  function applyHeight() {
+    const input = document.getElementById("rowHeightInput");
+    const height = parseInt(input.value);
+
+    if (isNaN(height) || height <= 0) {
+      alert("Будь ласка, введіть коректне число більше нуля.");
+      return;
+    }
+
+    google.script.run.withSuccessHandler(function () {
+      input.value = ""; // очищуємо поле
+    }).setUniformRowHeight(height);
+  }
+</script>
+
+</body>
+</html>
