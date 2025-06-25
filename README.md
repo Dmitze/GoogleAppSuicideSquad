@@ -1,154 +1,83 @@
-GoogleAppSuicideSquad
-A powerful Google Apps Script automation tool for tracking changes in Google Sheets , logging activity history, and exporting data to reports — all integrated with Google Drive . 
+# GoogleAppSuicideSquad
 
-This project is designed to help manage and monitor data in a military-style unit (battalion or division), ensuring full transparency of user actions, maintaining logs, and generating structured reports when needed.
+A powerful Google Apps Script automation suite for Google Sheets — enabling advanced change tracking, audit logging, analytics, and seamless exports to Excel, CSV, and Word, all fully integrated with Google Drive.  
+Originally designed for military-style units (battalions/divisions), this toolkit is perfect for any team or organization needing transparency, robust data control, and effortless reporting.
 
-🧰 Features
-✅ Change Logging
-Tracks additions, deletions, edits, and formula updates on key sheets.
-Logs are stored in a dedicated sheet ("Лог змін" / "Change Log").
-Different color highlighting for change types:
-Green: New entries
-Red: Deletions
-Blue: Edits
-Yellow: Formula changes
-📤 Data Exporting
-Export logs and data to:
-.xlsx (Excel)
-.csv
-Optional export templates for Microsoft Word via custom dialogs or third-party integrations.
-Auto-cleanup of old backups based on retention settings.
-📁 Google Drive Integration
-Stores temporary files, archives, and logs in a designated folder on Google Drive (via TMP_FOLDER_ID).
-Ability to list and manage all log files directly from the Drive.
-🗂 Archive Management
-Manual and automated archiving of logs by date.
-Supports daily triggers for automatic cleanup and backup.
-🔍 Validation & Analytics
-Spell check and format validation to ensure consistent data entry.
-User-based analytics: see who edited what, and how often.
-🧭 Custom Menu UI
-Adds a custom menu in Google Sheets for quick access to:
-Export options
-Spell check
-Manual validation
-Activity reports
-Trigger management
+---
 
-📁 File Structure
-Here’s an overview of the files in your project:
+## 🚀 Features
 
-1. general.gs
-Contains core configuration and setup logic.
-Defines constants like sheet names, important ranges, and color codes.
-backupLogSheet.gs
-profile
+### ✅ Change Logging & Audit Trail
+- **Tracks all edits**: additions, deletions, value edits, and formula changes across key sheets.
+- **Detailed logs**: Every change is recorded in a dedicated “Change Log” sheet, including timestamp, user, sheet, cell, action type, before/after values, formulas, and “important” flag.
+- **Visual feedback**: Color-coded highlighting of changes (green for additions, red for deletions, yellow for edits).
 
-🎯 GoogleAppSuicideSquad
-A powerful Google Apps Script automation tool for tracking changes in Google Sheets , logging activity history, and exporting data to reports — all integrated with Google Drive . 
+### 📁 Google Drive Integration & Archiving
+- **Centralized storage**: All logs, temporary files, and exports are kept in a designated Google Drive folder.
+- **Flexible exports**: One-click export of logs/data to Excel (.xlsx), CSV, or Word (.docx) — with direct download links.
+- **Automatic archiving**: Daily or manual log archiving with cleanup of old backups based on retention settings.
+- **File management**: Quickly list, restore, or delete backup/archive files.
 
-This project is designed to help manage and monitor data in a military-style unit (battalion or division), ensuring full transparency of user actions, maintaining logs, and generating structured reports when needed.
+### 📤 Advanced Exporting & Reporting
+- **Export to Word**: Instantly export any sheet or range to Word, with custom dialogs for complex reports (headers, multiple tables, descriptions).
+- **User-friendly dialogs**: HTML-based popups and sidebars for choosing export options, formatting, and previews.
+- **Custom report generator**: Fill out forms to create structured Word reports with dynamic tables and metadata.
 
-🧰 Features
-✅ Change Logging
-Tracks additions, deletions, edits, and formula updates on key sheets.
-Logs are stored in a dedicated sheet ("Лог змін" / "Change Log").
-Different color highlighting for change types:
-Green: New entries
-Red: Deletions
-Blue: Edits
-Yellow: Formula changes
-📤 Data Exporting
-Export logs and data to:
-.xlsx (Excel)
-.csv
-Optional export templates for Microsoft Word via custom dialogs or third-party integrations.
-Auto-cleanup of old backups based on retention settings.
-📁 Google Drive Integration
-Stores temporary files, archives, and logs in a designated folder on Google Drive (via TMP_FOLDER_ID).
-Ability to list and manage all log files directly from the Drive.
-🗂 Archive Management
-Manual and automated archiving of logs by date.
-Supports daily triggers for automatic cleanup and backup.
-🔍 Validation & Analytics
-Spell check and format validation to ensure consistent data entry.
-User-based analytics: see who edited what, and how often.
-🧭 Custom Menu UI
-Adds a custom menu in Google Sheets for quick access to:
-Export options
-Spell check
-Manual validation
-Activity reports
-Trigger management
-📁 File Structure
-Here’s an overview of the files in your project:
+### 🔍 Validation, Search, and Analytics
+- **Data validation**: Ensures consistent, high-quality data entry (format checks, spell checks, etc.).
+- **History search**: Powerful search and retrieval of change logs and historical data.
+- **User analytics**: Understand who changed what, when, and where — with activity reports by user, sheet, and date.
 
-1. general.gs
-Contains core configuration and setup logic.
-Defines constants like sheet names, important ranges, and color codes.
-profile
+### 🧭 Custom UI & Automation
+- **Smart menu**: Adds a custom menu in Google Sheets for instant access to all major features (audit, export, formatting, triggers, etc).
+- **Quick formatting**: Easily adjust row heights via sidebar interface.
+- **Automated triggers**: Schedule daily backups and archiving without manual intervention.
 
-🎯 GoogleAppSuicideSquad
-A powerful Google Apps Script automation tool for tracking changes in Google Sheets , logging activity history, and exporting data to reports — all integrated with Google Drive . 
+---
 
-This project is designed to help manage and monitor data in a military-style unit (battalion or division), ensuring full transparency of user actions, maintaining logs, and generating structured reports when needed.
+## 📦 File Structure
 
-🧰 Features
-✅ Change Logging
-Tracks additions, deletions, edits, and formula updates on key sheets.
-Logs are stored in a dedicated sheet ("Лог змін" / "Change Log").
-Different color highlighting for change types:
-Green: New entries
-Red: Deletions
-Blue: Edits
-Yellow: Formula changes
-📤 Data Exporting
-Export logs and data to:
-.xlsx (Excel)
-.csv
-Optional export templates for Microsoft Word via custom dialogs or third-party integrations.
-Auto-cleanup of old backups based on retention settings.
-📁 Google Drive Integration
-Stores temporary files, archives, and logs in a designated folder on Google Drive (via TMP_FOLDER_ID).
-Ability to list and manage all log files directly from the Drive.
-🗂 Archive Management
-Manual and automated archiving of logs by date.
-Supports daily triggers for automatic cleanup and backup.
-🔍 Validation & Analytics
-Spell check and format validation to ensure consistent data entry.
-User-based analytics: see who edited what, and how often.
-🧭 Custom Menu UI
-Adds a custom menu in Google Sheets for quick access to:
-Export options
-Spell check
-Manual validation
-Activity reports
-Trigger management
-📁 File Structure
-Here’s an overview of the files in your project:
+```
+/
+├── general.gs                  # Core logic, configuration, constants, menu, change monitoring
+├── backupLogSheet.js           # Log backup/archiving, cleanup, Drive file management
+├── export_To_World.js          # Simple export of sheet range to Word
+├── exportToWordWithDialog.js   # Advanced Word export (custom dialog, multi-table, headers)
+├── validator.gs                # Data validation and checks
+├── user_report.gs              # User activity analytics and reports
+├── logs_restore.gs             # Restoration of archived logs
+├── globals.gs                  # Global variables and utility functions
+├── SidebarG                    # Script for row height UI logic
+├── Sidebar.html                # HTML sidebar for formatting
+├── WordExportForm.html         # HTML form for complex Word reports
+├── logs_restor.html            # HTML dialog for log restoration
+├── README.md                   # You are here!
+```
 
-1. general.gs
-Contains core configuration and setup logic.
-Defines constants like sheet names, important ranges, and color codes.
-2. backupLogSheet.gs
-Handles log archiving and cleanup.
-Manages temporary files and folders on Google Drive.
-3. WordExportForm.html
-Provides a custom dialog for exporting logs to Microsoft Word.
-Uses HTML/CSS/JavaScript for interactive forms.
-4. logs_restore.gs
-Restores archived logs back into the main spreadsheet.
-Useful for recovering historical data.
-5. globals.gs
-Contains global variables and utility functions used across scripts.
-6. logs_restor.html
-Another custom dialog for restoring logs, likely with form inputs.
-7. exportToWordWithDialog.gs
-Integrates with WordExportForm.html to handle exports to Word.
-8. export_To_Word.gs
-Core logic for exporting data to Microsoft Word.
-9. validator.gs
-Performs data validation and spell checking.
-Ensures consistency in data entry.
-10. user_report.gs
-Generates user activity reports based on logged changes.
+---
+
+## 🛡️ Use Cases
+
+- **Military units**: Track equipment, personnel, and supply changes with full auditability.
+- **Business teams**: Ensure transparency and accountability in collaborative spreadsheets.
+- **Project management**: Maintain a tamper-proof history and generate professional reports on demand.
+- **Any organization**: Where change tracking, compliance, and reliable backup matter.
+
+---
+
+## ⚡ Quick Start
+
+1. **Copy all scripts/files** into your Google Apps Script project attached to your Google Sheet.
+2. **Set your Google Drive folder ID** (`TMP_FOLDER_ID`) for backups/archives.
+3. Reload your Google Sheet — the custom menu will appear automatically.
+4. Start tracking, analyzing, exporting, and feeling secure!
+
+---
+
+## 📋 Credits & License
+
+Developed by [Dmitze](https://github.com/Dmitze).  
+MIT License.  
+Contributions and feedback are welcome!
+
+---
