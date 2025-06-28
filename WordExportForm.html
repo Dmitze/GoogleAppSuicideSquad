@@ -2,78 +2,263 @@
 <html>
   <head>
     <base target="_top">
+    <meta charset="UTF-8">
+    <title>Генератор Word-звіту</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Toastify для уведомлений -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- SortableJS для Drag&Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
     <style>
-      body { font-family: sans-serif; }
-      .block { margin-bottom: 15px; }
-      label { display: block; margin-bottom: 2px; }
-      table.preview { border-collapse: collapse; font-size: 0.95em; }
-      table.preview td, table.preview th { border: 1px solid #aaa; padding: 2px 5px; }
+      * {box-sizing: border-box; transition: all 0.3s ease;}
+      body {font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px; color: #333;}
+      h3 {margin-bottom: 20px; font-weight: 600; color: #2b3e50; text-align: center;}
+      .container {max-width: 1100px; margin: auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);}
+      .block {margin-bottom: 20px;}
+      label {display: block; margin-bottom: 6px; font-weight: 500; color: #555;}
+      input[type="text"],input[type="date"],textarea,select {width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em;}
+      textarea {resize: vertical; min-height: 60px;}
+      button {padding: 10px 16px; font-size: 1em; font-weight: 500; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease;}
+      button:hover {opacity: 0.9;}
+      .btn-main {background: #4a90e2; color: white;}
+      .btn-add {background: #2ecc71; color: white;}
+      .btn-remove {background: #e74c3c; color: white; font-size: 1em;}
+      .btn-preview {background: #f39c12; color: white; font-size: 1em;}
+      .btn-update-sheets {background: #27ae60; color: white; font-size: 1em;}
+      .export-btn {margin-right: 10px;}
+      .tableRow {display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; flex-wrap: wrap; padding: 10px; border-left: 4px solid #4a90e2; background: #f9f9f9; border-radius: 6px; position: relative; cursor:move;}
+      .sortable-ghost {opacity:0.6;}
+      .previewArea {margin-top: 10px; overflow-x: auto; max-height: 200px; display: none; animation: fadeIn 0.3s;}
+      @keyframes fadeIn {from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);}}
+      table.preview {border-collapse: collapse; width: 100%; font-size: 0.9em; border: 1px solid #ddd;}
+      table.preview th, table.preview td {border: 1px solid #ddd; padding: 6px 10px; text-align: left;}
+      table.preview th {background-color: #f2f2f2; font-weight: 600;}
+      #status {margin-top: 20px; font-weight: bold; font-size: 1em; color: #2b3e50;}
+      small {color: #888;}
+      .progress-bar-background {
+        width: 100%;
+        background: #e0e0e0;
+        border-radius: 8px;
+        margin-top: 25px;
+        height: 18px;
+        position: relative;
+        overflow: hidden;
+        display: none;
+      }
+      .progress-bar {
+        background: linear-gradient(90deg, #4a90e2, #2ecc71, #f39c12, #e74c3c, #4a90e2);
+        background-size: 200% 100%;
+        animation: progressmove 1s linear infinite;
+        height: 100%;
+        width: 100%;
+        border-radius: 8px;
+        transition: width 0.3s;
+      }
+      @keyframes progressmove {
+        0% {background-position: 0% 50%;}
+        100% {background-position: 100% 50%;}
+      }
+      .export-group {margin-bottom: 20px; text-align: center;}
     </style>
   </head>
   <body>
-    <h3>Генератор Word-звіту</h3>
+    <div class="container">
+      <h3>📊 Генератор Word-звіту</h3>
 
-    <div class="block">
-      <label>Начальник:</label>
-      <input id="boss" type="text" style="width: 90%;" value="">
-    </div>
-    <div class="block">
-      <label>Дата:</label>
-      <input id="date" type="date" style="width: 40%;">
-      <label>Наказ:</label>
-      <input id="order" type="text" style="width: 90%;">
-    </div>
-    <div class="block">
-      <label>Заголовок звіту:</label>
-      <input id="title" type="text" style="width: 90%;" value="">
-    </div>
-    <div class="block">
-      <label>Опис (пояснення):</label>
-      <textarea id="description" style="width: 95%; height: 40px;"></textarea>
-    </div>
+      <form id="reportForm" autocomplete="off" onsubmit="exportReport();return false;">
+      <div class="block">
+        <label for="boss">Начальник:</label>
+        <input id="boss" list="boss_list" type="text" placeholder="Іванов І.І." required autocomplete="off">
+        <datalist id="boss_list"></datalist>
+      </div>
 
-    <div class="block" id="tablesBlock">
-      <label>Таблиці (лист + діапазон):</label>
-      <div id="tablesList"></div>
-      <button type="button" onclick="addTableRow()">+ Додати таблицю</button>
-    </div>
+      <div class="block">
+        <label for="date">Дата:</label>
+        <input id="date" type="date" required>
+      </div>
 
-    <button onclick="exportReport()" style="font-size:1.1em;">Сформувати Word</button>
-    <div id="status" style="margin-top:15px;"></div>
+      <div class="block">
+        <label for="order">Наказ:</label>
+        <input id="order" type="text" placeholder="№123 від 01.01.2025" required pattern="№\d+ від \d{2}\.\d{2}\.\d{4}">
+        <small>Формат: №123 від 01.01.2025</small>
+      </div>
+
+      <div class="block">
+        <label for="title">Заголовок звіту:</label>
+        <input id="title" type="text" placeholder="Підсумковий звіт за квартал" required>
+      </div>
+
+      <div class="block">
+        <label for="description">Опис (пояснення):</label>
+        <textarea id="description" placeholder="Додайте пояснювальний текст до звіту..." required></textarea>
+      </div>
+
+      <div class="block" id="tablesBlock">
+        <label>Таблиці (лист + діапазон):</label>
+        <div class="export-group">
+          <button type="button" class="btn-update-sheets" onclick="updateSheetNames()">🔄 Оновити листи</button>
+        </div>
+        <div id="tablesList"></div>
+        <button type="button" onclick="addTableRow()" class="btn-add">+ Додати таблицю</button>
+      </div>
+
+      <div class="export-group">
+        <button type="button" class="btn-main export-btn" onclick="exportReport('word')">📄 Сформувати Word</button>
+        <button type="button" class="btn-main export-btn" onclick="exportReport('pdf')">🔽 Завантажити PDF</button>
+        <button type="button" class="btn-main export-btn" onclick="exportReport('excel')">📊 Завантажити Excel</button>
+      </div>
+      <div class="progress-bar-background" id="progressBarBg">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div id="status"></div>
+      </form>
+    </div>
 
     <script>
       let sheetNames = [];
+
+      // Сохранение/загрузка состояния формы в localStorage
+      const FORM_STORAGE_KEY = "word_export_form_state_v2";
+      function saveFormState() {
+        let state = {
+          boss: document.getElementById('boss').value,
+          date: document.getElementById('date').value,
+          order: document.getElementById('order').value,
+          title: document.getElementById('title').value,
+          description: document.getElementById('description').value,
+          tables: Array.from(document.querySelectorAll('.tableRow')).map(row => ({
+            sheet: row.querySelector('.sheetSel').value,
+            range: row.querySelector('.rangeInput').value
+          }))
+        };
+        localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(state));
+      }
+      function loadFormState() {
+        let s = localStorage.getItem(FORM_STORAGE_KEY);
+        if (!s) return;
+        try {
+          let state = JSON.parse(s);
+          document.getElementById('boss').value = state.boss || "";
+          document.getElementById('date').value = state.date || "";
+          document.getElementById('order').value = state.order || "";
+          document.getElementById('title').value = state.title || "";
+          document.getElementById('description').value = state.description || "";
+          document.getElementById('tablesList').innerHTML = "";
+          if (Array.isArray(state.tables) && state.tables.length) {
+            state.tables.forEach(t => addTableRow(t.sheet, t.range));
+          }
+        } catch(e){}
+      }
+      function clearFormState() {
+        localStorage.removeItem(FORM_STORAGE_KEY);
+      }
+      // Save on change
+      setInterval(saveFormState, 700);
+
+      // Drag & Drop reorder
+      window.addEventListener('DOMContentLoaded', function() {
+        new Sortable(document.getElementById('tablesList'), {
+          animation: 150,
+          handle: '.tableRow',
+          ghostClass: 'sortable-ghost',
+          onEnd: saveFormState
+        });
+      });
+
       function addTableRow(sheet='', range='') {
-        const idx = document.querySelectorAll('.tableRow').length;
         const div = document.createElement('div');
         div.className = 'tableRow';
         div.innerHTML = `
+          <span style="cursor:grab;user-select:none;" title="Перетягніть">&#x2630;</span>
           <select class="sheetSel">${sheetNames.map(n => `<option value="${n}" ${n===sheet?'selected':''}>${n}</option>`).join('')}</select>
-          <input type="text" class="rangeInput" style="width:70px;" value="${range||'A1:B2'}">
-          <button type="button" onclick="this.parentElement.remove()">🗑️</button>
-          <button type="button" onclick="showPreview(this)">👁️</button>
+          <input type="text" class="rangeInput" value="${range||'A1:B2'}" placeholder="A1:B2">
+          <button type="button" class="btn-remove" title="Видалити">&#128465;</button>
+          <button type="button" class="btn-preview" title="Переглянути">👁️ Перегляд</button>
           <div class="previewArea"></div>
         `;
         document.getElementById('tablesList').appendChild(div);
+
+        // Toggle preview on click
+        div.querySelector('.btn-preview').addEventListener('click', () => {
+          const previewArea = div.querySelector('.previewArea');
+          if (previewArea.style.display === 'block') {
+            previewArea.style.display = 'none';
+          } else {
+            showPreview(div.querySelector('.btn-preview'));
+            previewArea.style.display = 'block';
+          }
+        });
+
+        // Remove row on click
+        div.querySelector('.btn-remove').addEventListener('click', () => {
+          div.remove();
+          saveFormState();
+        });
+
+        // Save state on change
+        div.querySelector('.sheetSel').addEventListener('change', saveFormState);
+        div.querySelector('.rangeInput').addEventListener('input', saveFormState);
       }
 
       function showPreview(btn) {
         const row = btn.parentElement;
         const sheet = row.querySelector('.sheetSel').value;
         const range = row.querySelector('.rangeInput').value;
-        row.querySelector('.previewArea').innerHTML = '...';
+        const previewArea = row.querySelector('.previewArea');
+        previewArea.innerHTML = '⏳ Завантажую...';
+
         google.script.run.withSuccessHandler(data => {
-          if (!data.length) { row.querySelector('.previewArea').innerHTML = '<i>порожньо</i>'; return; }
+          if (!data.length) {
+            previewArea.innerHTML = '<i>Дані відсутні</i>';
+            return;
+          }
           let html = '<table class="preview"><tr>' +
             data[0].map(h => `<th>${h}</th>`).join('') + '</tr>';
           for (let i=1; i<data.length; ++i)
             html += '<tr>' + data[i].map(c => `<td>${c}</td>`).join('') + '</tr>';
           html += '</table>';
-          row.querySelector('.previewArea').innerHTML = html;
+          previewArea.innerHTML = html;
         }).getPreviewData(sheet, range);
       }
 
-      function exportReport() {
+      // Маска для номера приказа
+      document.addEventListener('DOMContentLoaded', function() {
+        const orderInput = document.getElementById('order');
+        orderInput.addEventListener('input', function() {
+          this.setCustomValidity(this.value.match(/^№\d+ від \d{2}\.\d{2}\.\d{4}$/) ? '' : 'Формат: №123 від 01.01.2025');
+        });
+      });
+
+      // Динамическое обновление листов
+      function updateSheetNames() {
+        google.script.run.withSuccessHandler(function(names){
+          sheetNames = names;
+          // Обновить все выпадающие списки
+          Array.from(document.querySelectorAll('.sheetSel')).forEach(sel => {
+            let curr = sel.value;
+            sel.innerHTML = sheetNames.map(n => `<option value="${n}">${n}</option>`).join('');
+            sel.value = curr || sheetNames[0];
+          });
+          Toastify({text:"✅ Листи оновлено!", backgroundColor: "#2ecc71"}).showToast();
+        }).getSheetNames();
+      }
+
+      // Индикатор прогресса
+      function showProgressBar(show=true) {
+        const bg = document.getElementById('progressBarBg');
+        bg.style.display = show ? 'block' : 'none';
+      }
+
+      // Экспорт Word/PDF/Excel
+      function exportReport(format='word') {
+        let form = document.getElementById('reportForm');
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          Toastify({text: "❌ Заповніть усі обовʼязкові поля!", backgroundColor: "#e74c3c"}).showToast();
+          return;
+        }
         const header = {
           boss: document.getElementById('boss').value,
           date: document.getElementById('date').value,
@@ -85,25 +270,94 @@
           sheet: row.querySelector('.sheetSel').value,
           range: row.querySelector('.rangeInput').value,
         }));
-        if (!tables.length) { document.getElementById('status').innerHTML = 'Додайте хоча б одну таблицю!'; return; }
-        document.getElementById('status').innerHTML = '⏳ Формуємо...';
-        google.script.run
-          .withSuccessHandler(url => {
-            document.getElementById('status').innerHTML =
-              `<b>✅ Word-файл створено!</b> <a href="${url}" target="_blank">Завантажити</a>`;
-          })
-          .withFailureHandler(e => {
-            document.getElementById('status').innerHTML =
-              `<span style="color:red;">❌ ${e.message || e}</span>`;
-          })
-          .generateWordReport({ header, title, description, tables });
+
+        if (!tables.length) {
+          Toastify({
+            text: "❌ Додайте хоча б одну таблицю!",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "#e74c3c"
+          }).showToast();
+          return;
+        }
+
+        // Проверка выбранных листов и диапазонов
+        for (const t of tables) {
+          if (!t.sheet || !t.range) {
+            Toastify({
+              text: "❌ Не обрано лист або діапазон у таблиці!",
+              duration: 4000,
+              gravity: "top",
+              position: "center",
+              backgroundColor: "#e74c3c"
+            }).showToast();
+            return;
+          }
+        }
+
+        document.getElementById('status').innerHTML = '';
+        showProgressBar(true);
+
+        let successHandler = function(url) {
+          showProgressBar(false);
+          let txt = '';
+          if (format === 'word') txt = `<b>✅ Word-файл створено!</b> <a href="${url}" target="_blank" style="color:#4a90e2;">📥 Завантажити</a>`;
+          else if (format === 'pdf') txt = `<b>✅ PDF-файл створено!</b> <a href="${url}" target="_blank" style="color:#4a90e2;">📥 Завантажити</a>`;
+          else if (format === 'excel') txt = `<b>✅ Excel-файл створено!</b> <a href="${url}" target="_blank" style="color:#4a90e2;">📥 Завантажити</a>`;
+          document.getElementById('status').innerHTML = txt;
+          Toastify({
+            text: "✔️ Файл успішно сформовано!",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "#2ecc71"
+          }).showToast();
+          clearFormState(); // Очистить сохранённое состояние если всё успешно
+        };
+        let failHandler = function(e) {
+          showProgressBar(false);
+          document.getElementById('status').innerHTML =
+            `<span style="color:red;">❌ Помилка: ${e.message || e}</span>`;
+          Toastify({
+            text: `❌ Помилка: ${e.message || e}`,
+            duration: 5000,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "#e74c3c"
+          }).showToast();
+        };
+
+        if (format === 'word') {
+          google.script.run.withSuccessHandler(successHandler).withFailureHandler(failHandler)
+            .generateWordReport({ header, title, description, tables });
+        } else if (format === 'pdf') {
+          google.script.run.withSuccessHandler(successHandler).withFailureHandler(failHandler)
+            .generatePdfReport({ header, title, description, tables });
+        } else if (format === 'excel') {
+          google.script.run.withSuccessHandler(successHandler).withFailureHandler(failHandler)
+            .generateExcelReport({ header, title, description, tables });
+        }
       }
 
-      // Инициализация: получить листы и добавить одну таблицу по умолчанию
+      // Инициализация: получить листы и добавить одну таблицу по умолчанию, загрузить состояние
       google.script.run.withSuccessHandler(function(names){
         sheetNames = names;
-        if (sheetNames.length) addTableRow(sheetNames[0], 'A1:B2');
+        loadFormState();
+        // Если после загрузки нет таблиц — добавить одну по умолчанию
+        if (!document.querySelector('.tableRow') && sheetNames.length) addTableRow(sheetNames[0], 'A1:B2');
       }).getSheetNames();
+
+      // Автозаполнение начальника (datalist) из Google Sheets
+      google.script.run.withSuccessHandler(function(arr){
+        let dl = document.getElementById('boss_list');
+        dl.innerHTML = "";
+        arr.forEach(name => {
+          let opt = document.createElement('option');
+          opt.value = name;
+          dl.appendChild(opt);
+        });
+      }).getBossesList();
     </script>
   </body>
 </html>
