@@ -70,29 +70,29 @@
       <form id="reportForm" autocomplete="off" onsubmit="exportReport();return false;">
       <div class="block">
         <label for="boss">Начальник:</label>
-        <input id="boss" list="boss_list" type="text" placeholder="Іванов І.І." required autocomplete="off">
+        <input id="boss" list="boss_list" type="text" placeholder="Іванов І.І." autocomplete="off">
         <datalist id="boss_list"></datalist>
       </div>
 
       <div class="block">
         <label for="date">Дата:</label>
-        <input id="date" type="date" required>
+        <input id="date" type="date">
       </div>
 
       <div class="block">
         <label for="order">Наказ:</label>
-        <input id="order" type="text" placeholder="№123 від 01.01.2025" required pattern="№\d+ від \d{2}\.\d{2}\.\d{4}">
+        <input id="order" type="text" placeholder="№123 від 01.01.2025" pattern="№\d+ від \d{2}\.\d{2}\.\d{4}">
         <small>Формат: №123 від 01.01.2025</small>
       </div>
 
       <div class="block">
         <label for="title">Заголовок звіту:</label>
-        <input id="title" type="text" placeholder="Підсумковий звіт за квартал" required>
+        <input id="title" type="text" placeholder="Підсумковий звіт за квартал">
       </div>
 
       <div class="block">
         <label for="description">Опис (пояснення):</label>
-        <textarea id="description" placeholder="Додайте пояснювальний текст до звіту..." required></textarea>
+        <textarea id="description" placeholder="Додайте пояснювальний текст до звіту..."></textarea>
       </div>
 
       <div class="block" id="tablesBlock">
