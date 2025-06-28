@@ -154,7 +154,6 @@
       function clearFormState() {
         localStorage.removeItem(FORM_STORAGE_KEY);
       }
-      // Save on change
       setInterval(saveFormState, 700);
 
       // Drag & Drop reorder
@@ -253,12 +252,7 @@
 
       // Экспорт Word/PDF/Excel
       function exportReport(format='word') {
-        let form = document.getElementById('reportForm');
-        if (!form.checkValidity()) {
-          form.reportValidity();
-          Toastify({text: "❌ Заповніть усі обовʼязкові поля!", backgroundColor: "#e74c3c"}).showToast();
-          return;
-        }
+        // УБРАНА вся валидация на обязательные поля!
         const header = {
           boss: document.getElementById('boss').value,
           date: document.getElementById('date').value,
@@ -270,31 +264,6 @@
           sheet: row.querySelector('.sheetSel').value,
           range: row.querySelector('.rangeInput').value,
         }));
-
-        if (!tables.length) {
-          Toastify({
-            text: "❌ Додайте хоча б одну таблицю!",
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            backgroundColor: "#e74c3c"
-          }).showToast();
-          return;
-        }
-
-        // Проверка выбранных листов и диапазонов
-        for (const t of tables) {
-          if (!t.sheet || !t.range) {
-            Toastify({
-              text: "❌ Не обрано лист або діапазон у таблиці!",
-              duration: 4000,
-              gravity: "top",
-              position: "center",
-              backgroundColor: "#e74c3c"
-            }).showToast();
-            return;
-          }
-        }
 
         document.getElementById('status').innerHTML = '';
         showProgressBar(true);
@@ -313,7 +282,7 @@
             position: "center",
             backgroundColor: "#2ecc71"
           }).showToast();
-          clearFormState(); // Очистить сохранённое состояние если всё успешно
+          clearFormState();
         };
         let failHandler = function(e) {
           showProgressBar(false);
@@ -344,7 +313,6 @@
       google.script.run.withSuccessHandler(function(names){
         sheetNames = names;
         loadFormState();
-        // Если после загрузки нет таблиц — добавить одну по умолчанию
         if (!document.querySelector('.tableRow') && sheetNames.length) addTableRow(sheetNames[0], 'A1:B2');
       }).getSheetNames();
 
