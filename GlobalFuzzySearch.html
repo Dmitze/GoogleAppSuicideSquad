@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <title>Гнучкий пошук</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Toastify для уведомлений -->
+    <script src=" https://cdn.jsdelivr.net/npm/toastify-js "></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css ">
+
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: 'Roboto', sans-serif;
+      }
+
+      body {
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        color: #333;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      }
+
+      h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #2b3e50;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 10px 16px;
+        font-size: 1em;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background: #4a90e2;
+        color: white;
+        transition: background 0.3s ease;
+      }
+
+      button:hover {
+        background: #357ABD;
+      }
+
+      #loader {
+        display: none;
+        margin-left: 10px;
+        color: #4a90e2;
+      }
+
+      #results {
+        margin-top: 20px;
+        max-height: 380px;
+        overflow-y: auto;
+      }
+
+      .hit {
+        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+      }
+
+      .sheet {
+        color: #2e7d32;
+        font-weight: 600;
+      }
+
+      .cell {
+        color: #1565c0;
+      }
+
+      .value {
+        color: #333;
+        font-weight: bold;
+      }
+
+      .reason {
+        color: #888;
+        font-size: 0.9em;
+        margin-left: 8px;
+      }
+
+      .copy-btn {
+        margin-left: 10px;
+        background: #f39c12;
+        color: white;
+        font-size: 0.9em;
+        padding: 4px 8px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .copy-btn:hover {
+        background: #d68910;
+      }
+
+      small {
+        display: block;
+        margin-top: 4px;
+        color: #888;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3>🔍 Гнучкий пошук по всіх листах</h3>
+      <input type="text" id="query" placeholder="Введіть текст для пошуку..." oninput="autoSearch()">
+      <small>Мінімум 3 символи для автопошуку</small>
+      <button onclick="runSearch()">Пошук</button>
+      <span id="loader">🔄 Шукаємо...</span>
+      <div id="results"></div>
+    </div>
+
+    <script>
+      // Автопоиск при вводе
+      function autoSearch() {
+        const query = document.getElementById('query').value.trim();
+        if (query.length >= 3) runSearch();
+      }
+
+      function runSearch() {
+        const q = document.getElementById('query').value.trim();
+        const resultsDiv = document.getElementById('results');
+        const loader = document.getElementById('loader');
+
+        if (!q || q.length < 2) {
+          resultsDiv.innerHTML = '<em>Введіть щонайменше 2 символи</em>';
+          return;
+        }
+
+        loader.style.display = 'inline';
+        resultsDiv.innerHTML = '';
+
+        google.script.run.withSuccessHandler(data => {
+          loader.style.display = 'none';
+          showResults(data, q);
+        }).globalFuzzySheetSearch(q);
+      }
+
+      function highlight(text, query) {
+        if (!query) return text;
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<b style="background-color:#ffeeba;">$1</b>');
+      }
+
+      function copyLink(link) {
+        const fullUrl = window.location.origin + window.location.pathname + link;
+        navigator.clipboard.writeText(fullUrl).then(() => {
+          Toastify({
+            text: "🔗 Посилання скопійовано!",
+            duration: 2000,
+            backgroundColor: "#2ecc71"
+          }).showToast();
+        });
+      }
+
+      function showResults(res, query) {
+        const resultsDiv = document.getElementById('results');
+        if (!res || res.length === 0) {
+          resultsDiv.innerHTML = '<em>Нічого не знайдено</em>';
+          return;
+        }
+
+        let html = `<b>Знайдено: ${res.length} результат(ів)</b><br>`;
+        res.forEach(hit => {
+          html += `
+            <div class="hit">
+              <span class="sheet">🗂 ${hit.sheet}</span> |
+              <span class="cell">📍 <a href="${hit.link}" target="_blank">${hit.a1}</a></span> |
+              <span class="value">${highlight(hit.value, query)}</span>
+              <span class="reason">[${hit.reason}]</span>
+              <button class="copy-btn" onclick="copyLink('${hit.link}')">📋 Копіювати</button>
+            </div>`;
+        });
+
+        resultsDiv.innerHTML = html;
+      }
+    </script>
+  </body>
+</html>
