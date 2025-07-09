@@ -65,11 +65,7 @@ function onEdit(e) {
   if (!e || !e.range) return;
   const sheet = e.range.getSheet();
   if (sheet.getName() === LOG_SHEET_NAME) return;
-
-  // Підсвічуємо змінену клітинку
   highlightCell(e);
-
-  // Логуємо зміну (якщо не службова колонка)
   logCellEdit(e);
 }
 
@@ -89,17 +85,14 @@ function highlightCell(e) {
   if (oldValue === newValue) return;
 
   if ((oldValue === "" || oldValue === null) && newValue !== "") {
-    cell.setBackground("#b6d7a8"); // Зелений
+    cell.setBackground("#b6d7a8"); 
   } else if (oldValue !== "" && (newValue === "" || newValue === null)) {
-    cell.setBackground("#ea9999"); // Червоний
+    cell.setBackground("#ea9999"); 
   } else {
-    cell.setBackground("#ffe599"); // Жовтий
+    cell.setBackground("#ffe599");
   }
 }
 
-/**
- * Логує зміну значення клітинки (тільки для несервісних колонок)
- */
 function logCellEdit(e) {
   const sheet = e.range.getSheet();
   const logSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(LOG_SHEET_NAME);
@@ -119,15 +112,12 @@ function logCellEdit(e) {
   )) {
     return;
   }
-
-  // Пропускаємо якщо це зміна в заголовку
   if (row === 1) return;
 
  const user = "Військовослужбовець"; 
   const time = new Date();
   const oldValue = e.oldValue !== undefined ? e.oldValue : "";
   const newValue = e.value !== undefined ? e.value : "";
-
   let changeType = "";
   if ((oldValue === "" || oldValue === null) && newValue !== "") {
     changeType = "Додано значення";
@@ -147,14 +137,11 @@ function logCellEdit(e) {
     changeType,
     oldValue,
     newValue,
-    "", // Формула (не використовується тут)
-    ""  // Важлива зміна (не використовується тут)
+    "", 
+    ""  
   ]);
 }
 
-/**
- * Створення аркуша для логів (якщо не існує)
- */
 function setupLogSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let logSheet = ss.getSheetByName(LOG_SHEET_NAME);
@@ -210,8 +197,6 @@ function checkChanges() {
       highlightChanges(sheet, oldValues, values);
       logChanges(sheet, oldValues, values);
     }
-
-    // Логування додавання/видалення рядків/стовпців
     if (
       Array.isArray(oldValues) &&
       Array.isArray(values) &&
