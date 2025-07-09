@@ -1,8 +1,6 @@
-// === КОНФИГУРАЦИЯ ===
 const DEFAULT_DOC_NAME = "Експортований лист";
 const DEFAULT_WORD_FILE_NAME = "ExportedSheet.docx";
 
-// Получение списка начальников для автозаполнения
 function getBossesList() {
   let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Довідники');
   if (!sheet) return [];
@@ -10,7 +8,6 @@ function getBossesList() {
   return data;
 }
 
-// === Показать диалог выбора листа и діапазона ===
 function showExportToWordDialog() {
   const sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
   const sheetOptions = sheets.map(s => `<option value="${s.getName()}">${s.getName()}</option>`).join("");
@@ -95,8 +92,7 @@ function showExportToWordDialog() {
   `).setWidth(700).setHeight(420);
   SpreadsheetApp.getUi().showModalDialog(html, "Експорт до Word / PDF / Excel");
 }
-
-// === Экспорт в Word ===
+ 
 function exportSheetRangeToWordCustom(sheetName, rangeA1, wordFileName) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -122,11 +118,8 @@ function exportSheetRangeToWordCustom(sheetName, rangeA1, wordFileName) {
 }
 
 function generatePdfReport(formData) {
-  // Создаём Google Doc
   const doc = DocumentApp.create('Word звіт');
   const body = doc.getBody();
-
-  // Шапка
   if (formData.header) {
     if (formData.header.boss) body.appendParagraph(`Начальник: ${formData.header.boss}`).setHeading(DocumentApp.ParagraphHeading.HEADING3);
     if (formData.header.date) body.appendParagraph(`Дата: ${formData.header.date}`).setHeading(DocumentApp.ParagraphHeading.HEADING3);
@@ -135,8 +128,6 @@ function generatePdfReport(formData) {
   }
   if (formData.title) body.appendParagraph(formData.title).setHeading(DocumentApp.ParagraphHeading.HEADING1);
   if (formData.description) body.appendParagraph(formData.description).setHeading(DocumentApp.ParagraphHeading.HEADING2);
-
-  // Таблицы
   if (formData.tables && Array.isArray(formData.tables)) {
     formData.tables.forEach((t, idx) => {
       if (!t.sheet || !t.range) return;
@@ -151,12 +142,9 @@ function generatePdfReport(formData) {
 
   doc.saveAndClose();
 
-  // Экспортируем как PDF
   const file = DriveApp.getFileById(doc.getId());
   const pdfBlob = file.getAs('application/pdf').setName("WordReport.pdf");
   const exported = DriveApp.createFile(pdfBlob);
-
-  // Очищаем временный Google Doc
   file.setTrashed(true);
 
   return exported.getUrl();
@@ -182,19 +170,16 @@ function generateExcelReport(formData) {
   return exported.getUrl();
 }
 
-// Открытие HTML-формы (WordExportForm.html)
 function showWordExportFullForm() {
   const html = HtmlService.createHtmlOutputFromFile('WordExportForm')
     .setWidth(1200).setHeight(1600);
   SpreadsheetApp.getUi().showModalDialog(html, "Генератор Word-звіту");
 }
 
-// Получение списка всех листов для формы
 function getSheetNames() {
   return SpreadsheetApp.getActiveSpreadsheet().getSheets().map(s => s.getName());
 }
 
-// Получение данных диапазона для предварительного просмотра
 function getPreviewData(sheetName, rangeA1) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   if (!sheet) return [];
