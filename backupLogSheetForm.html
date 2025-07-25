@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 15px;
+    }
+
+    h3 {
+      margin-top: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      margin-bottom: 10px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h3>Загрузите CSV-файл</h3>
+  <input type="file" id="csvFile" accept=".csv" />
+  <button onclick="uploadAndDisplay()">Загрузить</button>
+
+  <div id="error" class="error"></div>
+
+  <h3>Содержимое CSV:</h3>
+  <div id="tableContainer"></div>
+
+  <script>
+    function uploadAndDisplay() {
+      const fileInput = document.getElementById('csvFile');
+      const errorDiv = document.getElementById('error');
+      const tableContainer = document.getElementById('tableContainer');
+
+      if (!fileInput.files.length) {
+        errorDiv.textContent = "Пожалуйста, выберите файл.";
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const csvData = e.target.result;
+
+        google.script.run.withSuccessHandler(function(result) {
+          if (result && result.error) {
+            errorDiv.textContent = result.error;
+            tableContainer.innerHTML = "";
+          } else {
+            displayCSVTable(result);
+            errorDiv.textContent = "";
+          }
+        }).importCSV(csvData);
+      };
+
+      reader.readAsText(file);
+    }
+
+    function displayCSVTable(data) {
+      const container = document.getElementById('tableContainer');
+      let html = '<table>';
+
+      data.forEach((row, index) => {
+        html += '<tr>';
+        row.forEach(cell => {
+          const tag = index === 0 ? 'th' : 'td';
+          html += `<${tag}>${cell}</${tag}>`;
+        });
+        html += '</tr>';
+      });
+
+      html += '</table>';
+      container.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
