@@ -1,3 +1,6 @@
+/**
+ * Діалог вибору колонок для генерації ключа. Користувач вводить назви через кому (до 3 штук).
+ */
 function generateKeysWithCustomColumns() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = sheet.getDataRange().getValues();
@@ -6,6 +9,8 @@ function generateKeysWithCustomColumns() {
     return;
   }
   const header = data[0];
+
+  // Діалог для вибору колонок, через кому, максимум 3
   const ui = SpreadsheetApp.getUi();
   const result = ui.prompt(
     'Вкажіть до 3 назв колонок через кому (наприклад: Марка,Модель,VIN):',
@@ -24,6 +29,9 @@ function generateKeysWithCustomColumns() {
   generateKeysWithPermanentId(sheet, header, keyCols);
 }
 
+/**
+ * Генерує "Ідентифікатор" та "Постійний ID" для поточного листа за вибраними колонками
+ */
 function generateKeysWithPermanentId(sheet, header, keyCols) {
   if (!sheet || typeof sheet.getDataRange !== 'function') {
     throw new Error('sheet не передано або це не обʼєкт аркуша Google Таблиць!');
@@ -38,20 +46,27 @@ function generateKeysWithPermanentId(sheet, header, keyCols) {
   const data = sheet.getDataRange().getValues();
   const idCol = findOrCreateColumn(sheet, header, 'Ідентифікатор');
   const permCol = findOrCreateColumn(sheet, header, 'Постійний ID', true);
+
+  // Знайти індекси вибраних користувачем колонок (ігноруємо регістр і зайві пробіли)
   const keyColIdxs = keyCols.map(name =>
     header.findIndex(h =>
       typeof h === 'string' &&
       h.trim().toLowerCase() === name.trim().toLowerCase()
     )
   );
+
   for (let row = 1; row < data.length; row++) {
+    // Перевіряємо наявність усіх обов'язкових полів
     const keyBase = keyColIdxs.map(idx => (idx !== -1 ? (data[row][idx] || '') : '')).join('_');
     const hasData = keyColIdxs.every(idx => idx !== -1 && data[row][idx] && String(data[row][idx]).trim().length > 0);
+
+    // Постійний ID: якщо порожньо — генеруємо UUID, інакше залишаємо існуючий
     let permId = data[row][permCol];
     if (hasData && (!permId || permId === '')) {
       permId = Utilities.getUuid();
       sheet.getRange(row + 1, permCol + 1).setValue(permId);
     }
+    // Якщо є обов'язкові поля — генеруємо Ідентифікатор, інакше очищаємо обидва поля
     if (hasData) {
       const id = generateProductEncryptedId(keyBase);
       sheet.getRange(row + 1, idCol + 1).setValue(id);
@@ -62,6 +77,10 @@ function generateKeysWithPermanentId(sheet, header, keyCols) {
   }
 }
 
+/**
+ * Генерує QR-коди та клікабельні посилання для кожного Постійного ID.
+ * QR-код маленький у колонці "QR-код", велике посилання у колонці "Посилання на QR".
+ */
 function generateQRCodesForSheet() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = sheet.getDataRange().getValues();
@@ -70,6 +89,7 @@ function generateQRCodesForSheet() {
   const permCol = findOrCreateColumn(sheet, header, 'Постійний ID', true);
   const qrCol = findOrCreateColumn(sheet, header, 'QR-код');
   const qrLinkCol = findOrCreateColumn(sheet, header, 'Посилання на QR');
+
   for (let row = 1; row < data.length; row++) {
     const permId = data[row][permCol];
     if (permId && String(permId).trim().length > 0) {
@@ -84,6 +104,9 @@ function generateQRCodesForSheet() {
   }
 }
 
+/**
+ * Генерує QR-коди з повною інформацією по рядку + логування.
+ */
 function generateFullInfoQRCodesForSheet() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = sheet.getDataRange().getValues();
@@ -93,12 +116,16 @@ function generateFullInfoQRCodesForSheet() {
   }
   const header = data[0];
 
+  // Уникаємо дублювання колонок
   clearColumnByHeader(sheet, header, 'QR');
   clearColumnByHeader(sheet, header, 'link');
 
+  // Додаємо колонки (якщо немає)
   const qrCol = findOrCreateColumn(sheet, header, 'QR');
   const linkCol = findOrCreateColumn(sheet, header, 'link');
+
   for (let row = 1; row < data.length; row++) {
+    // Формуємо текст з усіх колонок (тільки непусті значення)
     let text = header
       .map((col, idx) =>
         (col && data[row][idx] && String(data[row][idx]).trim().length > 0)
@@ -107,7 +134,8 @@ function generateFullInfoQRCodesForSheet() {
       )
       .filter(Boolean)
       .join('\n');
-    
+
+    // Обрізаємо якщо дуже довго (QR-сервіс має обмеження)
     if (text.length > 400) {
       text = text.substring(0, 397) + '...';
     }
@@ -124,6 +152,9 @@ function generateFullInfoQRCodesForSheet() {
   }
 }
 
+/**
+ * Очищує колонку з QR-кодами, якщо є (залишає заголовок)
+ */
 function clearColumnByHeader(sheet, header, colName) {
   let idx = header.findIndex(
     h => typeof h === 'string' && h.trim().toLowerCase() === colName.trim().toLowerCase()
@@ -133,6 +164,9 @@ function clearColumnByHeader(sheet, header, colName) {
   }
 }
 
+/**
+ * Шукає колонку за заголовком, створює якщо немає. Повертає індекс (0-based)
+ */
 function findOrCreateColumn(sheet, header, colName, isHidden) {
   let idx = header.findIndex(
     h => typeof h === 'string' && h.trim().toLowerCase() === colName.trim().toLowerCase()
@@ -147,6 +181,10 @@ function findOrCreateColumn(sheet, header, colName, isHidden) {
   return idx;
 }
 
+/**
+ * Експортує список товарів з ключами та QR-кодами у CSV-файл на Google Диск.
+ * Повертає посилання на створений файл.
+ */
 function exportProductsWithKeysToCSV() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = sheet.getDataRange().getValues();
@@ -177,6 +215,9 @@ function exportProductsWithKeysToCSV() {
   return file.getUrl();
 }
 
+/**
+ * Генерує зашифрований ідентифікатор для товару
+ */
 function generateProductEncryptedId(rawString) {
   const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, rawString + new Date().getFullYear());
   const base64 = Utilities.base64Encode(digest);
