@@ -1,5 +1,6 @@
 
-const TMP_FOLDER_ID = '';
+const TMP_FOLDER_ID = '14EX4nx7NACIv0qCnJL0soVivEmI4SG9G';
+
 function getTmpFolderOrThrow() {
   try {
     return DriveApp.getFolderById(TMP_FOLDER_ID);
