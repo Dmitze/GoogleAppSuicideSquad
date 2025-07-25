@@ -7,42 +7,140 @@
       font-family: Arial;
       padding: 20px;
     }
-    input[type="number"] {
-      width: 80px;
-      margin: 10px 0;
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 5px;
+      margin: 5px 0;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
+    select, button {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    .section {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+    h3 {
+      margin-top: 0;
     }
   </style>
 </head>
 <body>
 
-<h2>Вирівняти висоту рядків</h2>
-<p>Введіть бажану висоту:</p>
-<input type="number" id="rowHeightInput" placeholder="Наприклад: 21" />
-<br/><br/>
-<button onclick="applyHeight()">Застосувати</button>
+<!-- Форматування рядків і стовпців -->
+<div class="section">
+  <h3>📏 Форматування</h3>
+  <p>Висота рядків (px):</p>
+  <input type="number" id="rowHeightInput" placeholder="Наприклад: 21" />
+
+  <p>Ширина стовпців (px):</p>
+  <input type="number" id="colWidthInput" placeholder="Наприклад: 120" />
+
+  <button onclick="applyFormatting()">Застосувати</button>
+</div>
+
+<!-- Текстові перетворення -->
+<div class="section">
+  <h3>🔤 Текстові перетворення</h3>
+  <p>Текст:</p>
+  <input type="text" id="inputText" placeholder="Введіть текст" />
+
+  <p>Винятки / заміни:</p>
+  <input type="text" id="exceptionsInput" placeholder="Слова через кому або word→заміна" />
+
+  <p>Дія:</p>
+  <select id="actionSelect">
+    <option value="lowercase">Перевести в нижній регістр</option>
+    <option value="remove">Видалити слова</option>
+    <option value="replace">Замінити слова</option>
+    <option value="count">Порахувати слова</option>
+    <option value="reverse">Перевернути текст</option>
+    <option value="mask">Замаскувати початок</option>
+  </select>
+
+  <button onclick="applyTextAction()">Виконати</button>
+
+  <p><strong>Результат:</strong></p>
+  <textarea id="resultText" style="width:100%; height:100px;" readonly></textarea>
+</div>
 
 <script>
-  function applyHeight() {
-    const input = document.getElementById("rowHeightInput");
-    const height = parseInt(input.value);
+  // Форматування
+  function applyFormatting() {
+    const rowInput = document.getElementById("rowHeightInput");
+    const colInput = document.getElementById("colWidthInput");
+    const rowHeight = parseInt(rowInput.value);
+    const colWidth = parseInt(colInput.value);
 
-    if (isNaN(height) || height <= 0) {
-      alert("Будь ласка, введіть коректне число більше нуля.");
+    if ((rowInput.value && (isNaN(rowHeight) || rowHeight <= 0)) ||
+        (colInput.value && (isNaN(colWidth) || colWidth <= 0))) {
+      alert("Будь ласка, введіть коректні числа більше нуля.");
       return;
     }
 
-    google.script.run.withSuccessHandler(function () {
-      input.value = ""; // очищуємо поле
-    }).setUniformRowHeight(height);
+    if (rowHeight > 0) {
+      google.script.run.setUniformRowHeight(rowHeight);
+    }
+
+    if (colWidth > 0) {
+      google.script.run.setUniformColumnWidth(colWidth);
+    }
+  }
+
+  // Текстові дії
+  function applyTextAction() {
+    const inputText = document.getElementById("inputText").value;
+    const exceptions = document.getElementById("exceptionsInput").value;
+    const action = document.getElementById("actionSelect").value;
+    const resultBox = document.getElementById("resultText");
+
+    if (!inputText) {
+      alert("Введіть текст для обробки.");
+      return;
+    }
+
+    switch (action) {
+      case "lowercase":
+        google.script.run
+          .withSuccessHandler(result => resultBox.value = result)
+          .TOLOWERCASEEXCEPT(inputText, exceptions);
+        break;
+
+      case "remove":
+        google.script.run
+          .withSuccessHandler(result => resultBox.value = result)
+          .REMOVEWORDS(inputText, exceptions);
+        break;
+
+      case "replace":
+        google.script.run
+          .withSuccessHandler(result => resultBox.value = result)
+          .REPLACEWORDS(inputText, exceptions);
+        break;
+
+      case "count":
+        resultBox.value = google.script.run.COUNTWORDS(inputText);
+        break;
+
+      case "reverse":
+        google.script.run
+          .withSuccessHandler(result => resultBox.value = result)
+          .REVERSETEXT(inputText);
+        break;
+
+      case "mask":
+        const maskCount = prompt("Скільки символів замаскувати?", "4");
+        if (maskCount && !isNaN(maskCount) && maskCount > 0) {
+          google.script.run
+            .withSuccessHandler(result => resultBox.value = result)
+            .MASKTEXT(inputText, maskCount);
+        }
+        break;
+    }
   }
 </script>
 
