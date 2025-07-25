@@ -9,7 +9,9 @@ function onOpen() {
     .addItem("📁 Експортувати товари з ключами (CSV)", "exportProductsWithKeysToCSV");
 
   const formattingMenu = ui.createMenu("📏 Форматування")
-    .addItem("📐 Вирівняти висоту рядків", "showSidebar");
+    .addItem("💡 Підсвітити збіги ID БпЛА", "highlightMatchingValues")
+    .addItem("💡 Очистити кольори ID БпЛА", "clearHighlights")
+    .addItem("🧩 Інструменти", "showSidebar");
 
   // 3. Меню "📄 Експорт до Word"
   const wordExportMenu = ui.createMenu("📄 Експорт до Word")
@@ -20,7 +22,7 @@ function onOpen() {
   // 4. Меню "🕵️‍♂️ Перевірка та логи"
   const validationMenu = ui.createMenu("🕵️‍♂️ Перевірка та логи")
     .addItem("📊 Звіт по діям користувачів", "showUsersActionReport")
-    .addItem("Ввести ім’я", "promptForUsername")
+    .addItem("Ввести ім’я", "promptForUsername");
 
   // 5. Меню "📦 Логи та архівація"
   const logMenu = ui.createMenu("📦 Логи та архівація")
@@ -30,6 +32,7 @@ function onOpen() {
   // 6. Меню "🔍 Пошук"
   const searchMenu = ui.createMenu("🔍 Пошук")
     .addItem('Гнучкий пошук по всіх листах', 'showGlobalFuzzySearchDialog');
+
 
   // Главное меню
   ui.createMenu("📋 Головне меню")
@@ -44,4 +47,10 @@ function onOpen() {
   if (typeof setupLogSheet === 'function') {
     setupLogSheet();
   }
+}
+
+function showSidebar() {
+  const html = HtmlService.createHtmlOutputFromFile('Sidebar')
+    .setTitle("Форматування та текстові перетворення");
+  SpreadsheetApp.getUi().showSidebar(html);
 }
