@@ -1,14 +1,127 @@
+
 function setUniformRowHeight(rowHeight) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const dataRange = sheet.getDataRange();
   const lastRow = dataRange.getLastRow();
 
   if (!rowHeight || isNaN(rowHeight) || rowHeight <= 0) {
-    SpreadsheetApp.getUi().alert("❌ Помилка\n\nВведіть коректне число для висоти.");
+    SpreadsheetApp.getUi().alert("❌ Помилка\n\nВведіть коректне число більше нуля.");
     return;
   }
 
   sheet.setRowHeights(1, lastRow, rowHeight);
-
   SpreadsheetApp.getUi().alert("✅ Готово\n\nВисота рядків встановлена на " + rowHeight + " px");
 }
+
+function setUniformColumnWidth(colWidth) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const dataRange = sheet.getDataRange();
+  const lastCol = dataRange.getLastColumn();
+
+  if (!colWidth || isNaN(colWidth) || colWidth <= 0) {
+    SpreadsheetApp.getUi().alert("❌ Помилка\n\nВведіть коректне число більше нуля.");
+    return;
+  }
+
+  sheet.setColumnWidths(1, lastCol, colWidth);
+  SpreadsheetApp.getUi().alert("✅ Готово\n\nШирина стовпців встановлена на " + colWidth + " px");
+}
+
+function NUMBERSTOWORDS(num) {
+  const units = ["", "один", "два", "три", "чотири", "п’ять", "шість", "сім", "вісім", "дев’ять"];
+  const teens = ["десять", "одинадцять", "дванадцять", "тринадцять", "чотирнадцять", "п’ятнадцять", "шістнадцять", "сімнадцять", "вісімнадцять", "дев’ятнадцять"];
+  const tens = ["", "", "двадцять", "тридцять", "сорок", "п’ятдесят", "шістдесят", "сімдесят", "вісімдесят", "дев’яносто"];
+
+  if (num === 0) return "нуль";
+  if (num < 10) return units[num];
+  if (num < 20) return teens[num - 10];
+  const ten = Math.floor(num / 10);
+  const unit = num % 10;
+  return tens[ten] + (unit ? " " + units[unit] : "");
+}
+
+function TOLOWERCASEEXCEPT(text, exceptions) {
+  const exceptionList = exceptions.split(',').map(w => w.trim()).filter(w => w);
+  const words = text.split(' ');
+
+  return words.map(word => {
+    if (exceptionList.includes(word)) return word;
+    return word.toLowerCase();
+  }).join(' ');
+}
+
+
+function REMOVEWORDS(text, exceptions) {
+  const exceptionList = exceptions.split(',').map(w => w.trim()).filter(w => w);
+  const words = text.split(' ');
+
+  return words.filter(word => !exceptionList.includes(word)).join(' ');
+}
+
+
+function REPLACEWORDS(text, replacements) {
+  let result = text;
+  const pairs = replacements.split(',').map(pair => pair.trim()).filter(pair => pair);
+
+  pairs.forEach(pair => {
+    const [oldWord, newWord] = pair.split('→').map(w => w.trim());
+    if (oldWord && newWord) {
+      const regex = new RegExp(`\\b${oldWord}\\b`, 'g');
+      result = result.replace(regex, newWord);
+    }
+  });
+
+  return result;
+}
+
+function COUNTWORDS(text) {
+  if (!text || typeof text !== 'string') return 0;
+  const words = text.trim().split(/\s+/);
+  return words.length;
+}
+
+function REVERSETEXT(text) {
+  if (!text || typeof text !== 'string') return '';
+  return text.split('').reverse().join('');
+}
+
+
+function MASKTEXT(text, count, replaceWith = '*') {
+  if (!text || typeof text !== 'string') return '';
+  const chars = text.split('');
+  for (let i = 0; i < Math.min(count, chars.length); i++) {
+    chars[i] = replaceWith;
+  }
+  return chars.join('');
+}
+
+function REGEXMATCH(text, pattern) {
+  try {
+    const regex = new RegExp(pattern, 'g');
+    const matches = text.match(regex);
+    return matches ? matches.join(', ') : '';
+  } catch (e) {
+    return '❌ Некоректний регулярний вираз';
+  }
+}
+
+function TRANSLITERATE(text) {
+  const map = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'h', 'ґ': 'g',
+    'д': 'd', 'е': 'e', 'є': 'ie', 'ж': 'zh', 'з': 'z',
+    'и': 'y', 'і': 'i', 'ї': 'i', 'й': 'i', 'к': 'k',
+    'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p',
+    'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f',
+    'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch',
+    'ю': 'iu', 'я': 'ia', '’': '', 'А': 'A', 'Б': 'B',
+    'В': 'V', 'Г': 'H', 'Ґ': 'G', 'Д': 'D', 'Е': 'E',
+    'Є': 'Ie', 'Ж': 'Zh', 'З': 'Z', 'И': 'Y', 'І': 'I',
+    'Ї': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M',
+    'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S',
+    'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts',
+    'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch', 'Ю': 'Iu', 'Я': 'Ia'
+  };
+
+  return text.replace(/[а-яА-ЯґҐїЇєЄ’]/g, ch => map[ch] || '');
+}
+
