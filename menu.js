@@ -1,57 +1,122 @@
 function onOpen() {
-  const ui = SpreadsheetApp.getUi();
+  try {
+    const ui = SpreadsheetApp.getUi();
+    
+    // 1. Меню "🛠 Дії з таблицею"
+    const mainMenu = ui.createMenu("🛠 Дії з таблицею")
+      .addItem("📱 Згенерувати QR-коди з усіма даними", "generateFullInfoQRCodesForSheet")
+      .addItem("🔍 Гнучка генерація ключів", "generateKeysWithCustomColumns")
+      .addItem("📱 Згенерувати QR-коди за Постійним ID", "generateQRCodesForSheet")
+      .addItem("📁 Експортувати товари з ключами (CSV)", "exportProductsWithKeysToCSV");
 
-  // 1. Меню "🛠 Дії з таблицею"
-  const mainMenu = ui.createMenu("🛠 Дії з таблицею")
-    .addItem("📱 Згенерувати QR-коди з усіма даними", "generateFullInfoQRCodesForSheet")
-    .addItem("🔍 Гнучка генерація ключів", "generateKeysWithCustomColumns")
-    .addItem("📱 Згенерувати QR-коди за Постійним ID", "generateQRCodesForSheet")
-    .addItem("📁 Експортувати товари з ключами (CSV)", "exportProductsWithKeysToCSV");
+    const formattingMenu = ui.createMenu("📏 Форматування")
+      .addItem("💡 Підсвітити збіги ID БпЛА", "highlightMatchingValues")
+      .addItem("💡 Очистити кольори ID БпЛА", "clearHighlights")
+      .addItem("🧩 Інструменти", "showSidebar");
 
-  const formattingMenu = ui.createMenu("📏 Форматування")
-    .addItem("💡 Підсвітити збіги ID БпЛА", "highlightMatchingValues")
-    .addItem("💡 Очистити кольори ID БпЛА", "clearHighlights")
-    .addItem("🧩 Інструменти", "showSidebar");
+    // 3. Меню "📄 Експорт до Word"
+    const wordExportMenu = ui.createMenu("📄 Експорт до Word")
+      .addItem("📑 Скласти звіт у Word...", "showWordExportFullForm")
+      .addItem("📘 Експортувати до Word...", "showExportToWordDialog")
+      .addItem("📖 Експортувати виділений діапазон до Word", "exportSheetRangeToWord");
 
-  // 3. Меню "📄 Експорт до Word"
-  const wordExportMenu = ui.createMenu("📄 Експорт до Word")
-    .addItem("📑 Скласти звіт у Word...", "showWordExportFullForm")
-    .addItem("📘 Експортувати до Word...", "showExportToWordDialog")
-    .addItem("📖 Експортувати виділений діапазон до Word", "exportSheetRangeToWord");
+    // 4. Меню "🕵️‍♂️ Перевірка та логи"
+    const validationMenu = ui.createMenu("🕵️‍♂️ Перевірка та логи")
+      .addItem("📊 Звіт по діям користувачів", "showUsersActionReport")
+      .addItem("Ввести ім'я", "promptForUsername");
 
-  // 4. Меню "🕵️‍♂️ Перевірка та логи"
-  const validationMenu = ui.createMenu("🕵️‍♂️ Перевірка та логи")
-    .addItem("📊 Звіт по діям користувачів", "showUsersActionReport")
-    .addItem("Ввести ім’я", "promptForUsername");
+    // 5. Меню "📦 Логи та архівація"
+    const logMenu = ui.createMenu("📦 Логи та архівація")
+      .addItem("Сделать бекап в CSV", "backupLogAsCSV")
+      .addItem("Открыть форму импорта", "showBackupForm");
 
-  // 5. Меню "📦 Логи та архівація"
-  const logMenu = ui.createMenu("📦 Логи та архівація")
-    .addItem("Сделать бекап в CSV", "backupLogAsCSV")
-    .addItem("Открыть форму импорта", "showBackupForm");
+    // 6. Меню "🔍 Пошук"
+    const searchMenu = ui.createMenu("🔍 Пошук")
+      .addItem('Гнучкий пошук по всіх листах', 'showGlobalFuzzySearchDialog');
 
-  // 6. Меню "🔍 Пошук"
-  const searchMenu = ui.createMenu("🔍 Пошук")
-    .addItem('Гнучкий пошук по всіх листах', 'showGlobalFuzzySearchDialog');
+    // 7. Меню "Синхронизация" (ручная синхронизация копий)
+    const syncMenu = ui.createMenu('Синхронизация')
+      .addItem('1РБпАК 2ББпАК', 'syncToCopy1')
+      .addItem('2РБпАК 2ББпАК', 'syncToCopy2')
+      .addItem('3РБпАК 2ББпАК', 'syncToCopy3');
 
-  // 7. Меню "Синхронизация" (ручная синхронизация копий)
-  const syncMenu = ui.createMenu('Синхронизация')
-    .addItem('1РБпАК 2ББпАК', 'syncToCopy1')
-    .addItem('2РБпАК 2ББпАК', 'syncToCopy2')
-    .addItem('3РБпАК 2ББпАК', 'syncToCopy3');
+    // Главное меню
+    ui.createMenu("📋 Головне меню")
+      .addSubMenu(mainMenu)
+      .addSubMenu(formattingMenu)
+      .addSubMenu(wordExportMenu)
+      .addSubMenu(validationMenu)
+      .addSubMenu(logMenu)
+      .addSubMenu(searchMenu)
+      .addSubMenu(syncMenu)
+      .addToUi();
 
-  // Главное меню
-  ui.createMenu("📋 Головне меню")
-    .addSubMenu(mainMenu)
-    .addSubMenu(formattingMenu)
-    .addSubMenu(wordExportMenu)
-    .addSubMenu(validationMenu)
-    .addSubMenu(logMenu)
-    .addSubMenu(searchMenu)
-    .addSubMenu(syncMenu)
-    .addToUi();
+    if (typeof setupLogSheet === 'function') {
+      setupLogSheet();
+    }
+  } catch (error) {
+    // Логируем ошибку, но не прерываем выполнение
+    console.log('Помилка при створенні меню: ' + error.toString());
+  }
+}
 
-  if (typeof setupLogSheet === 'function') {
-    setupLogSheet();
+function createCustomMenu() {
+  try {
+    const ui = SpreadsheetApp.getUi();
+    
+    // 1. Меню "🛠 Дії з таблицею"
+    const mainMenu = ui.createMenu("🛠 Дії з таблицею")
+      .addItem("📱 Згенерувати QR-коди з усіма даними", "generateFullInfoQRCodesForSheet")
+      .addItem("🔍 Гнучка генерація ключів", "generateKeysWithCustomColumns")
+      .addItem("📱 Згенерувати QR-коди за Постійним ID", "generateQRCodesForSheet")
+      .addItem("📁 Експортувати товари з ключами (CSV)", "exportProductsWithKeysToCSV");
+
+    const formattingMenu = ui.createMenu("📏 Форматування")
+      .addItem("💡 Підсвітити збіги ID БпЛА", "highlightMatchingValues")
+      .addItem("💡 Очистити кольори ID БпЛА", "clearHighlights")
+      .addItem("🧩 Інструменти", "showSidebar");
+
+    // 3. Меню "📄 Експорт до Word"
+    const wordExportMenu = ui.createMenu("📄 Експорт до Word")
+      .addItem("📑 Скласти звіт у Word...", "showWordExportFullForm")
+      .addItem("📘 Експортувати до Word...", "showExportToWordDialog")
+      .addItem("📖 Експортувати виділений діапазон до Word", "exportSheetRangeToWord");
+
+    // 4. Меню "🕵️‍♂️ Перевірка та логи"
+    const validationMenu = ui.createMenu("🕵️‍♂️ Перевірка та логи")
+      .addItem("📊 Звіт по діям користувачів", "showUsersActionReport")
+      .addItem("Ввести ім'я", "promptForUsername");
+
+    // 5. Меню "📦 Логи та архівація"
+    const logMenu = ui.createMenu("📦 Логи та архівація")
+      .addItem("Сделать бекап в CSV", "backupLogAsCSV")
+      .addItem("Открыть форму импорта", "showBackupForm");
+
+    // 6. Меню "🔍 Пошук"
+    const searchMenu = ui.createMenu("🔍 Пошук")
+      .addItem('Гнучкий пошук по всіх листах', 'showGlobalFuzzySearchDialog');
+
+    // 7. Меню "Синхронизация" (ручная синхронизация копий)
+    const syncMenu = ui.createMenu('Синхронизация')
+      .addItem('1РБпАК 2ББпАК', 'syncToCopy1')
+      .addItem('2РБпАК 2ББпАК', 'syncToCopy2')
+      .addItem('3РБпАК 2ББпАК', 'syncToCopy3');
+
+    // Главное меню
+    ui.createMenu("📋 Головне меню")
+      .addSubMenu(mainMenu)
+      .addSubMenu(formattingMenu)
+      .addSubMenu(wordExportMenu)
+      .addSubMenu(validationMenu)
+      .addSubMenu(logMenu)
+      .addSubMenu(searchMenu)
+      .addSubMenu(syncMenu)
+      .addToUi();
+
+    return true;
+  } catch (error) {
+    console.log('Помилка при створенні меню: ' + error.toString());
+    return false;
   }
 }
 
