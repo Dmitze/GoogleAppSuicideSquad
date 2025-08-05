@@ -95,6 +95,14 @@
         <textarea id="description" placeholder="Додайте пояснювальний текст до звіту..."></textarea>
       </div>
 
+      <div class="block">
+        <label for="email">Email для відправки (необов'язково):</label>
+        <input id="email" type="email" placeholder="user@email.com">
+      </div>
+      <div class="block">
+        <button type="button" class="btn-main" onclick="useSelectedRange()">📋 Використати виділений діапазон</button>
+      </div>
+
       <div class="block" id="tablesBlock">
         <label>Таблиці (лист + діапазон):</label>
         <div class="export-group">
@@ -128,6 +136,7 @@
           order: document.getElementById('order').value,
           title: document.getElementById('title').value,
           description: document.getElementById('description').value,
+          email: document.getElementById('email').value,
           tables: Array.from(document.querySelectorAll('.tableRow')).map(row => ({
             sheet: row.querySelector('.sheetSel').value,
             range: row.querySelector('.rangeInput').value
@@ -145,6 +154,7 @@
           document.getElementById('order').value = state.order || "";
           document.getElementById('title').value = state.title || "";
           document.getElementById('description').value = state.description || "";
+          document.getElementById('email').value = state.email || "";
           document.getElementById('tablesList').innerHTML = "";
           if (Array.isArray(state.tables) && state.tables.length) {
             state.tables.forEach(t => addTableRow(t.sheet, t.range));
@@ -260,6 +270,7 @@
         };
         const title = document.getElementById('title').value;
         const description = document.getElementById('description').value;
+        const email = document.getElementById('email') ? document.getElementById('email').value : '';
         const tables = Array.from(document.querySelectorAll('.tableRow')).map(row => ({
           sheet: row.querySelector('.sheetSel').value,
           range: row.querySelector('.rangeInput').value,
@@ -283,6 +294,9 @@
             backgroundColor: "#2ecc71"
           }).showToast();
           clearFormState();
+          if(email) {
+            google.script.run.sendFileByEmail(email, url, (title||'ExportedSheet') + '.' + format, 'Ваш файл у вкладенні.');
+          }
         };
         let failHandler = function(e) {
           showProgressBar(false);
@@ -307,6 +321,16 @@
           google.script.run.withSuccessHandler(successHandler).withFailureHandler(failHandler)
             .generateExcelReport({ header, title, description, tables });
         }
+      }
+
+      function useSelectedRange() {
+        google.script.run.withSuccessHandler(function(a1){
+          if(a1) {
+            // Найти первое поле диапазона и подставить значение
+            let rangeInput = document.querySelector('.rangeInput') || document.getElementById('range');
+            if(rangeInput) rangeInput.value = a1;
+          }
+        }).getActiveRangeA1();
       }
 
       // Инициализация: получить листы и добавить одну таблицу по умолчанию, загрузить состояние

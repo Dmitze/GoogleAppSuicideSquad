@@ -2,31 +2,13 @@
 const DEFAULT_DOC_NAME = "Експортований лист";
 const DEFAULT_WORD_FILE_NAME = "ExportedSheet.docx";
 
-// Получение списка начальников для автозаполнения
-function getBossesList() {
-  let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Довідники');
-  if (!sheet) return [];
-  let data = sheet.getRange('A2:A').getValues().flat().filter(String);
-  return data;
-}
+// === Импортируем универсальные функции ===
+// (В Google Apps Script просто убедитесь, что export_utils.js подключён в проекте)
 
-// Открытие HTML-формы (WordExportForm.html)
 function showWordExportFullForm() {
   const html = HtmlService.createHtmlOutputFromFile('WordExportForm')
     .setWidth(1200).setHeight(1600);
   SpreadsheetApp.getUi().showModalDialog(html, "Генератор Word-звіту");
-}
-
-// Получение списка всех листов для формы
-function getSheetNames() {
-  return SpreadsheetApp.getActiveSpreadsheet().getSheets().map(s => s.getName());
-}
-
-// Получение данных диапазона для предварительного просмотра
-function getPreviewData(sheetName, rangeA1) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-  if (!sheet) return [];
-  return sheet.getRange(rangeA1).getValues();
 }
 
 // === ГЕНЕРАЦИЯ DOCX, PDF, XLSX С ОТЧЁТОМ ===
