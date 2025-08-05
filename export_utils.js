@@ -79,4 +79,114 @@ function sendFileByEmail(email, url, fileName, message) {
     body: message || 'Дивіться вкладення.',
     attachments: [blob]
   });
+}
+
+/**
+ * Вставка изображения (логотипа) в документ Google Docs
+ * @param {Body} body - тело документа
+ * @param {string} base64 - base64 PNG/JPG
+ */
+function insertLogo(body, base64) {
+  if (!base64) return;
+  const contentType = base64.startsWith('/') ? 'image/jpeg' : 'image/png';
+  const blob = Utilities.newBlob(Utilities.base64Decode(base64), contentType, 'logo');
+  body.appendImage(blob).setWidth(120).setHeight(60);
+}
+
+/**
+ * Применить стили к таблице (шрифт, цвет, фон)
+ */
+function styleTable(table, style) {
+  if (!style) return;
+  for (let r = 0; r < table.getNumRows(); r++) {
+    for (let c = 0; c < table.getRow(r).getNumCells(); c++) {
+      let cell = table.getRow(r).getCell(c);
+      if (style.tableBgColor) cell.setBackgroundColor(style.tableBgColor);
+      if (style.tableTextColor) cell.setForegroundColor(style.tableTextColor);
+      if (style.tableFont) cell.setFontFamily(style.tableFont);
+    }
+  }
+}
+
+function generateWordReport(formData) {
+  try {
+    const doc = DocumentApp.create(formData.title || 'Експортований лист');
+    const body = doc.getBody();
+    const style = formData.style || {};
+    // Логотип
+    if (style.logoBase64) insertLogo(body, style.logoBase64);
+    // Шапка
+    if (style.headerText) body.appendParagraph(style.headerText).setHeading(DocumentApp.ParagraphHeading.HEADING2);
+    // Стандартная шапка
+    if (formData.header) {
+      if (formData.header.boss) body.appendParagraph(`Начальник: ${formData.header.boss}`).setHeading(DocumentApp.ParagraphHeading.HEADING3);
+      if (formData.header.date) body.appendParagraph(`Дата: ${formData.header.date}`).setHeading(DocumentApp.ParagraphHeading.HEADING3);
+      if (formData.header.order) body.appendParagraph(`Наказ: ${formData.header.order}`).setHeading(DocumentApp.ParagraphHeading.HEADING3);
+      body.appendParagraph('');
+    }
+    if (formData.title) body.appendParagraph(formData.title).setHeading(DocumentApp.ParagraphHeading.HEADING1);
+    if (formData.description) body.appendParagraph(formData.description).setHeading(DocumentApp.ParagraphHeading.HEADING2);
+    if (formData.tables && Array.isArray(formData.tables)) {
+      formData.tables.forEach((t, idx) => {
+        if (!t.sheet || !t.range) return;
+        const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(t.sheet);
+        if (!sheet) return;
+        const values = sheet.getRange(t.range).getValues();
+        body.appendParagraph(`Таблиця ${idx+1}: ${t.sheet} ${t.range}`);
+        const table = body.appendTable(values);
+        styleTable(table, style);
+        body.appendParagraph('');
+      });
+    }
+    doc.saveAndClose();
+    const token = ScriptApp.getOAuthToken();
+    const url = `https://docs.google.com/feeds/download/documents/export/Export?id=${doc.getId()}&exportFormat=docx`;
+    const response = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+    const blob = response.getBlob().setName((formData.title || 'ExportedSheet') + '.docx');
+    const file = DriveApp.createFile(blob);
+    return file.getUrl();
+  } catch (e) {
+    throw new Error(e && e.message ? e.message : e);
+  }
+}
+
+function generatePdfReport(formData) {
+  try {
+    const doc = DocumentApp.create(formData.title || 'Експортований лист');
+    const body = doc.getBody();
+    const style = formData.style || {};
+    // Логотип
+    if (style.logoBase64) insertLogo(body, style.logoBase64);
+    // Шапка
+    if (style.headerText) body.appendParagraph(style.headerText).setHeading(DocumentApp.ParagraphHeading.HEADING2);
+    // Стандартная шапка
+    if (formData.header) {
+      if (formData.header.boss) body.appendParagraph(`Начальник: ${formData.header.boss}`).setHeading(DocumentApp.ParagraphHeading.HEADING3);
+      if (formData.header.date) body.appendParagraph(`Дата: ${formData.header.date}`).setHeading(DocumentApp.ParagraphHeading.HEADING3);
+      if (formData.header.order) body.appendParagraph(`Наказ: ${formData.header.order}`).setHeading(DocumentApp.ParagraphHeading.HEADING3);
+      body.appendParagraph('');
+    }
+    if (formData.title) body.appendParagraph(formData.title).setHeading(DocumentApp.ParagraphHeading.HEADING1);
+    if (formData.description) body.appendParagraph(formData.description).setHeading(DocumentApp.ParagraphHeading.HEADING2);
+    if (formData.tables && Array.isArray(formData.tables)) {
+      formData.tables.forEach((t, idx) => {
+        if (!t.sheet || !t.range) return;
+        const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(t.sheet);
+        if (!sheet) return;
+        const values = sheet.getRange(t.range).getValues();
+        body.appendParagraph(`Таблиця ${idx+1}: ${t.sheet} ${t.range}`);
+        const table = body.appendTable(values);
+        styleTable(table, style);
+        body.appendParagraph('');
+      });
+    }
+    doc.saveAndClose();
+    const file = DriveApp.getFileById(doc.getId());
+    const pdfBlob = file.getAs('application/pdf').setName((formData.title || 'ExportedSheet') + '.pdf');
+    const exported = DriveApp.createFile(pdfBlob);
+    file.setTrashed(true);
+    return exported.getUrl();
+  } catch (e) {
+    throw new Error(e && e.message ? e.message : e);
+  }
 } 

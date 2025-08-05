@@ -1,31 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Інструменти Google Sheets</title>
   <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
+    :root {
+      --primary: #1a73e8;
+      --secondary: #4c9aff;
+      --bg-gradient: linear-gradient(135deg, #e3eafc 0%, #f5f7fa 100%);
+      --card-bg: #fff;
+      --card-shadow: 0 4px 24px rgba(26, 115, 232, 0.08);
+      --card-radius: 18px;
+      --text-main: #222;
+      --text-muted: #6b7a90;
+      --accent: #a7bfff;
     }
-    input[type="number"], input[type="text"] {
-      width: 100%;
-      padding: 5px;
-      margin: 5px 0;
-    }
-    select, button {
-      width: 100%;
-      padding: 8px;
-      margin: 10px 0;
-      font-size: 14px;
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
     }
     .section {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 5px;
+      background: var(--card-bg);
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      padding: 24px 18px 18px 18px;
+      margin-bottom: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: fadeInUp 0.7s cubic-bezier(.4,1.4,.6,1) forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .section:nth-child(2) { animation-delay: 0.1s; }
+    .section:nth-child(3) { animation-delay: 0.2s; }
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: none; }
     }
     h3 {
-      margin-top: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 10px;
+      letter-spacing: 0.01em;
+    }
+    label, p {
+      font-weight: 500;
+      color: var(--primary);
+      margin-bottom: 4px;
+      font-size: 1.05em;
+    }
+    input[type="number"], input[type="text"], select, button, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #c7d0e1;
+      border-radius: 8px;
+      font-size: 1em;
+      background: #fff;
+      margin-bottom: 4px;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border: 1.5px solid var(--primary);
+      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.08);
+      outline: none;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 1.08em;
+      background: linear-gradient(145deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(.4,1.4,.6,1);
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.13);
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      margin-top: 8px;
+    }
+    button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 24px rgba(26, 115, 232, 0.18);
+      background: linear-gradient(145deg, #4c9aff, #1a73e8);
+    }
+    button:active {
+      transform: translateY(0) scale(1.01);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    @media (max-width: 700px) {
+      .section {
+        padding: 12px 6px 10px 6px;
+      }
     }
   </style>
 </head>
