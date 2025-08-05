@@ -1,5 +1,5 @@
 
-const TMP_FOLDER_ID = '14EX4nx7NACIv0qCnJL0soVivEmI4SG9G';
+const TMP_FOLDER_ID = '';
 
 function getTmpFolderOrThrow() {
   try {
