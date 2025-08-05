@@ -233,3 +233,127 @@ function checkChanges() {
     props.setProperty(storedValuesKey, JSON.stringify(values));
   });
 }
+
+/**
+ * Видаляє фрагменти SUMPRODUCT з формул у зазначених аркушах і діапазонах
+ * Налаштування: змінюйте startSheetNum, endSheetNum, colStart, colEnd, targetRow, replacementValue, dryRun
+ */
+function removeSumproductFragments() {
+  const config = {
+    startSheetNum: 19,
+    endSheetNum: 31,
+    colStart: "G",
+    colEnd: "W",
+    targetRow: "105",
+    replacementValue: "0", // Що ставити замість видаленого: "0", "", або "0"
+    dryRun: false,         // true — лише показати, що буде змінено
+  };
+
+  // Генерація імен аркушів
+  const sheetNames = [];
+  for (let i = config.startSheetNum; i <= config.endSheetNum; i++) {
+    sheetNames.push(`Sheet1 (${i})`);
+  }
+
+  // Екрануємо імена та формуємо фрагменти
+  const escapedNames = sheetNames.map(name =>
+    name.replace(/\(/g, '\\(').replace(/\)/g, '\\)')
+  );
+
+  const fragments = escapedNames.map(escapedName => {
+    return `\\+?SUMPRODUCT\\(\\(MOD\\(COLUMN\\('${escapedName}'!${config.colStart}${config.targetRow}:${escapedName}'!${config.colEnd}${config.targetRow}\\)-COLUMN\\('${escapedName}'!${config.colStart}${config.targetRow}\\);2\\)=0\\)\\*\\('${escapedName}'!${config.colStart}${config.targetRow}:${escapedName}'!${config.colEnd}${config.targetRow}\\)\\)`;
+  });
+
+  // Об'єднуємо в один регулярний вираз
+  const pattern = `(${fragments.join('|')})`;
+  const regex = new RegExp(pattern, 'g');
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const allSheets = ss.getSheets();
+
+  let totalChanges = 0;
+  const changeLog = [];
+
+  SpreadsheetApp.flush();
+
+  allSheets.forEach(sheet => {
+    const sheetName = sheet.getName();
+    const range = sheet.getDataRange();
+    const formulas = range.getFormulas();
+
+    let hasChangesInSheet = false;
+    const updatedFormulas = formulas.map((row, rowIndex) =>
+      row.map((formula, colIndex) => {
+        if (!formula || !formula.includes("SUMPRODUCT")) return formula;
+
+        const originalFormula = formula;
+        const startsWithEqual = formula.startsWith('=');
+        if (startsWithEqual) formula = formula.slice(1);
+
+        // Застосовуємо заміну
+        let newFormula = formula.replace(regex, "");
+
+        // Очищаємо зайві плюси та пробіли
+        newFormula = newFormula
+          .replace(/\+\+/g, "+")
+          .replace(/^\+/, "")
+          .replace(/\+$/, "")
+          .trim();
+
+        // Якщо порожньо — замінюємо на replacementValue
+        if (newFormula === "") {
+          newFormula = config.replacementValue;
+        }
+
+        // Повертаємо '=' якщо було
+        newFormula = startsWithEqual ? `=${newFormula}` : newFormula;
+
+        if (newFormula !== originalFormula) {
+          hasChangesInSheet = true;
+          totalChanges++;
+          changeLog.push({
+            sheet: sheetName,
+            cell: sheet.getRange(rowIndex + 1, colIndex + 1).getA1Notation(),
+            from: originalFormula,
+            to: newFormula
+          });
+          return newFormula;
+        }
+        return originalFormula;
+      })
+    );
+
+    // Оновлюємо лише якщо були зміни
+    if (hasChangesInSheet && !config.dryRun) {
+      range.setFormulas(updatedFormulas);
+    }
+  });
+
+  SpreadsheetApp.flush();
+
+  // Вивід результату
+  const ui = SpreadsheetApp.getUi();
+  let msg = `✅ Готово! Змінено формул: ${totalChanges}`;
+
+  if (config.dryRun) {
+    msg += "\n\nРежим перегляду (dry run). Формули не змінені.";
+  }
+
+  if (totalChanges > 0 && !config.dryRun) {
+    msg += "\n\nДеталі в логах (див. журнал виконання).";
+  }
+
+  if (totalChanges === 0) {
+    msg = "❌ Нічого не знайдено для видалення.";
+  }
+
+  ui.alert(msg);
+
+  // Друк у лог для деталей
+  if (changeLog.length > 0) {
+    console.log("Змінені формули:");
+    changeLog.forEach(log => {
+      console.log(`${log.sheet}!${log.cell}: \"${log.from}\" → \"${log.to}\"`);
+    });
+  }
+}
