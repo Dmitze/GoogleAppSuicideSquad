@@ -1,14 +1,12 @@
 # GoogleAppSuicideSquad
 
-A powerful Google Apps Script automation suite for Google Sheets — enabling advanced change tracking, audit logging, analytics, and seamless exports to Excel, CSV, and Word, all fully integrated with Google Drive.  
-Originally designed for military-style units (battalions/divisions), this toolkit is perfect for any team or organization needing transparency, robust data control, and effortless reporting.
+A powerful Google Apps Script automation suite for Google Sheets — enabling advanced change tracking, audit logging, analytics, and seamless exports to Excel, CSV, and Word, all fully integrated with Google Drive. Now with a modern, minimalist UI, beautiful dashboards, and flexible export options.
 
 ---
 
 # GoogleAppSuicideSquad
 
-Потужний набір інструментів автоматизації Google Apps Script для Google Sheets — забезпечує просунуте відстеження змін, аудит, аналітику та безшовний експорт в Excel, CSV і Word, повністю інтегрований з Google Drive.  
-Спочатку розроблений для підрозділів типу логістики, інформаційних технології, бухгалтерії, цей інструментарій ідеально підходить для будь-якої команди або організації, що потребує прозорості, надійного контролю даних та легкого створення звітів.
+Потужний набір інструментів автоматизації Google Apps Script для Google Sheets — забезпечує просунуте відстеження змін, аудит, аналітику та безшовний експорт в Excel, CSV і Word, повністю інтегрований з Google Drive. Тепер з сучасним мінімалістичним UI, красивими дашбордами та гнучким експортом.
 
 ---
 
@@ -26,9 +24,18 @@ Originally designed for military-style units (battalions/divisions), this toolki
 - **File management**: Quickly list, restore, or delete backup/archive files.
 
 ### 📤 Advanced Exporting & Reporting
-- **Export to Word**: Instantly export any sheet or range to Word, with custom dialogs for complex reports (headers, multiple tables, descriptions).
-- **User-friendly dialogs**: HTML-based popups and sidebars for choosing export options, formatting, and previews.
-- **Custom report generator**: Fill out forms to create structured Word reports with dynamic tables and metadata.
+- **Export to Word/PDF/Excel**: Instantly export any sheet or range to Word, PDF, or Excel, with custom dialogs for complex reports (headers, multiple tables, descriptions, and more).
+- **User-friendly dialogs**: Modern HTML-based popups and sidebars for choosing export options, formatting, and previews.
+- **Custom report generator**: Fill out forms to create structured Word/PDF reports with dynamic tables, metadata, and custom styles.
+- **Export selected range**: Export the currently selected range in Google Sheets with one click.
+- **Send to email**: Instantly send exported files to any email address.
+- **Styling & templates**: Choose table colors, fonts, add logos and custom headers for professional-looking reports.
+
+### 📊 Modern UI & Design
+- **Minimalist, responsive design**: All dialogs, forms, and dashboards use a clean, modern look with soft gradients, cards, and smooth animations.
+- **Dashboard-style reports**: User activity and analytics are presented in beautiful, interactive dashboards (HTML/CSS only, no frameworks).
+- **Adaptive layout**: Works perfectly on desktop and mobile.
+- **Subtle transitions and hover effects**: Buttons, cards, and tables feature smooth transitions and interactive feedback.
 
 ### 🔍 Validation, Search, and Analytics
 - **Data validation**: Ensures consistent, high-quality data entry (format checks, spell checks, etc.).
@@ -51,14 +58,23 @@ Originally designed for military-style units (battalions/divisions), this toolki
 
 ### 📁 Інтеграція з Google Drive та архівування
 - **Централізоване зберігання**: Всі логи, тимчасові файли та експорти зберігаються в призначеній папці Google Drive.
-- **Гнучий експорт**: Одним кліком експортуйте логи/дані в Excel (.xlsx), CSV або Word (.docx) — з прямими посиланнями для завантаження.
+- **Гнучкий експорт**: Одним кліком експортуйте логи/дані в Excel (.xlsx), CSV або Word (.docx) — з прямими посиланнями для завантаження.
 - **Автоматичне архівування**: Щоденне або ручне архівування логів з очищенням старих резервних копій на основі налаштувань зберігання.
 - **Управління файлами**: Швидке перерахування, відновлення або видалення резервних/архівних файлів.
 
 ### 📤 Просунутий експорт та звітність
-- **Експорт в Word**: Миттєво експортуйте будь-який лист або діапазон в Word з налаштовуваними діалогами для складних звітів (заголовки, множинні таблиці, описи).
-- **Користувацькі діалоги**: HTML-спливаючі вікна та бічні панелі для вибору опцій експорту, форматування та попереднього перегляду.
-- **Генератор користувацьких звітів**: Заповнюйте форми для створення структурованих Word-звітів з динамічними таблицями та метаданими.
+- **Експорт в Word/PDF/Excel**: Миттєво експортуйте будь-який лист або діапазон в Word, PDF чи Excel з налаштовуваними діалогами для складних звітів (заголовки, множинні таблиці, описи, стилі).
+- **Користувацькі діалоги**: Сучасні HTML-спливаючі вікна та бічні панелі для вибору опцій експорту, форматування та попереднього перегляду.
+- **Генератор користувацьких звітів**: Заповнюйте форми для створення структурованих Word/PDF-звітів з динамічними таблицями, метаданими та кастомними стилями.
+- **Експорт виділеного діапазону**: Експортуйте поточний виділений діапазон Google Sheets одним кліком.
+- **Відправка на email**: Миттєво надсилайте експортовані файли на будь-яку електронну адресу.
+- **Стили та шаблони**: Обирайте кольори таблиці, шрифти, додавайте логотипи та власні шапки для професійних звітів.
+
+### 📊 Сучасний UI та дизайн
+- **Мінімалістичний, адаптивний дизайн**: Всі діалоги, форми та дашборди мають чистий сучасний вигляд з м'якими градієнтами, картками та плавними анімаціями.
+- **Дашборд-звіти**: Аналітика користувачів та активності представлена у вигляді красивих дашбордів (HTML/CSS, без фреймворків).
+- **Адаптивна верстка**: Ідеально працює на десктопі та мобільних пристроях.
+- **Плавні переходи та ефекти**: Кнопки, картки та таблиці мають плавні переходи та інтерактивний фідбек.
 
 ### 🔍 Валідація, пошук та аналітика
 - **Валідація даних**: Забезпечує узгоджений, якісний ввід даних (перевірка форматів, орфографії тощо).
@@ -72,44 +88,34 @@ Originally designed for military-style units (battalions/divisions), this toolki
 
 ---
 
+## 🎨 UI & Design
+
+- **Modern minimalist look**: All HTML dialogs, forms, and dashboards use a clean, card-based design with soft gradients and subtle shadows.
+- **Responsive and mobile-friendly**: Layouts adapt to any device.
+- **Smooth animations**: Cards, buttons, and tables feature entrance and hover animations for a delightful user experience.
+- **Customizable exports**: Choose table colors, fonts, add logos and custom headers for exported Word/PDF reports.
+
+---
+
 ## 📦 File Structure
 
 ```
 /
-├── menu.js                     # Основне меню, синхронізація між підрозділами
-├── log.js                      # Система логування змін та аудиту
-├── user_report.js              # Аналітика дій користувачів та звіти
-├── get_keys_flexble.js         # Гнуча генерація ключів та QR-кодів
-├── globals.js                  # Глобальні змінні та утиліти
-├── global_table_search.js      # Глобальний нечіткий пошук по всіх листах
-├── exportToWordWithDialog.js   # Просунутий експорт в Word (діалоги, множинні таблиці)
-├── export_To_World.js          # Простий експорт діапазону листа в Word
-├── SidebarG                    # Скрипт для логіки UI висоти рядків
-├── Sidebar.html                # HTML бічна панель для форматування
-├── WordExportForm.html         # HTML форма для складних Word-звітів
-├── GlobalFuzzySearch.html      # HTML діалог для глобального пошуку
-├── README.md                   # Ви тут!
-├── CONTRIBUTING.md             # Керівництво по участі в проекті
-└── LICENSE                     # Ліцензія MIT
+├── menu.js                     # Main menu, cross-unit sync
+├── log.js                      # Change logging & audit system
+├── user_report.js              # User analytics & reporting
+├── export_utils.js             # Universal export and styling functions
+├── exportToWordWithDialog.js   # Advanced export to Word (dialogs, multi-table)
+├── export_To_World.js          # Simple range export to Word
+├── SidebarG                    # Row height UI logic
+├── Sidebar.html                # Modern sidebar for formatting
+├── WordExportForm.html         # Modern HTML form for complex Word/PDF/Excel reports
+├── UserReport.html             # Modern dashboard for user activity
+├── GlobalFuzzySearch.html      # Global search dialog
+├── README.md                   # You are here!
+├── CONTRIBUTING.md             # Contribution guide
+└── LICENSE                     # MIT License
 ```
-
----
-
-## 🛡️ Use Cases
-
-- **Military units**: Track equipment, personnel, and supply changes with full auditability.
-- **Business teams**: Ensure transparency and accountability in collaborative spreadsheets.
-- **Project management**: Maintain a tamper-proof history and generate professional reports on demand.
-- **Any organization**: Where change tracking, compliance, and reliable backup matter.
-
----
-
-## 🛡️ Застосування
-
-- **Підрозділи 1РБпАК, 2ББпАК, 3РБпАК**: Відстеження обладнання, персоналу та змін в постачанні з повною аудируваністю.
-- **Бізнес-команди**: Забезпечення прозорості та підзвітності в спільних таблицях.
-- **Управління проектами**: Підтримка захищеної від змін історії та генерація професійних звітів за запитом.
-- **Будь-яка організація**: Де важливі відстеження змін, відповідність вимогам та надійне резервне копіювання.
 
 ---
 
@@ -118,16 +124,7 @@ Originally designed for military-style units (battalions/divisions), this toolki
 1. **Copy all scripts/files** into your Google Apps Script project attached to your Google Sheet.
 2. **Set your Google Drive folder ID** (`TMP_FOLDER_ID`) for backups/archives.
 3. Reload your Google Sheet — the custom menu will appear automatically.
-4. Start tracking, analyzing, exporting, and feeling secure!
-
----
-
-## ⚡ Швидкий старт
-
-1. **Скопіюйте всі скрипти/файли** в ваш проект Google Apps Script, прикріплений до Google Таблиці.
-2. **Встановіть ID папки Google Drive** (`TMP_FOLDER_ID`) для резервних копій/архівів.
-3. Перезавантажте Google Таблицю — користувацьке меню з'явиться автоматично.
-4. Почніть відстежувати, аналізувати, експортувати та почуватися в безпеці!
+4. Start tracking, analyzing, exporting, and enjoying a beautiful modern UI!
 
 ---
 
@@ -136,13 +133,5 @@ Originally designed for military-style units (battalions/divisions), this toolki
 Developed by [Dmitze](https://github.com/Dmitze).  
 MIT License.  
 Contributions and feedback are welcome!
-
----
-
-## 📋 Автори та ліцензія
-
-Розроблено [Дмитрієм Шивачовим](https://t.me/Dmitry_Shiva).  
-MIT License.  
-Внесок у проект та зворотній зв'язок вітаються!
 
 ---
