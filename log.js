@@ -102,28 +102,33 @@ function highlightCell(e) {
  */
 function logCellEdit(e) {
   const sheet = e.range.getSheet();
+  if (sheet.getName() === LOG_SHEET_NAME) return;
+
   const logSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(LOG_SHEET_NAME);
   if (!logSheet) return;
+
   const col = e.range.getColumn();
   const row = e.range.getRow();
 
-  // Визначаємо назву колонки
   let header = '';
   try {
     header = sheet.getRange(1, col).getValue();
   } catch (err) {
-    header = '';
-  }
-  if (IGNORED_HEADERS.some(name =>
-    String(header).trim().toLowerCase() === name.trim().toLowerCase()
-  )) {
     return;
   }
 
-  // Пропускаємо якщо це зміна в заголовку
-  if (row === 1) return;
+  // Проверка на игнорируемые заголовки (регистронезависимо)
+  if (IGNORED_HEADERS.some(name =>
+    String(header).trim().toLowerCase() === name.trim().toLowerCase()
+  )) return;
 
- const user = "Військовослужбовець"; 
+  if (row === 1) return; // Заголовки не логируем
+
+  // Получаем имя пользователя
+  const username = PropertiesService.getUserProperties().getProperty("username");
+  const email = Session.getActiveUser().getEmail();
+  const user = username || (email ? email.split('@')[0] : "Анонім");
+
   const time = new Date();
   const oldValue = e.oldValue !== undefined ? e.oldValue : "";
   const newValue = e.value !== undefined ? e.value : "";
@@ -147,8 +152,8 @@ function logCellEdit(e) {
     changeType,
     oldValue,
     newValue,
-    "", // Формула (не використовується тут)
-    ""  // Важлива зміна (не використовується тут)
+    "",
+    ""
   ]);
 }
 
