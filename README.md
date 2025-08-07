@@ -97,6 +97,46 @@ A powerful Google Apps Script automation suite for Google Sheets — enabling ad
 
 ---
 
+## ⚙️ Trigger Setup (Important!)
+
+### Why This Matters
+The `onEdit` function uses an **installable trigger** to ensure that **all users' edits are logged**, not just the owner's. Without this, only the file owner will see their changes in the log.
+
+A **simple trigger** (`onEdit`) runs under the editing user’s identity, which may not have permission to write to the log sheet. An **installable trigger** runs under the **owner’s identity**, allowing it to log changes from **all editors**.
+
+### How to Set Up
+1. Open your Google Apps Script editor.
+2. Run the function `createInstallableTrigger()` **once** (only the owner should do this).
+3. Authorize the script if prompted.
+4. Go to **Triggers** (left menu) → You should see:
+   - Function: `onEdit`
+   - Event: `From spreadsheet` → `On edit`
+5. Done! Now every edit by any user will be logged correctly.
+
+> 🔔 Tip: You can also create this trigger manually via the Triggers menu if needed.
+
+---
+
+## ⚙️ Налаштування тригера (Важливо!)
+
+### Навіщо це потрібно
+Функція `onEdit` використовує **установлений тригер**, щоб забезпечити логування змін **від усіх користувачів**, а не тільки від власника. Без цього лише власник побачить свої зміни в логах.
+
+**Простий тригер** (`onEdit`) працює від імені редактора, який може не мати прав на запис у лог. **Установлений тригер** працює від імені **власника**, тому може логувати зміни **від усіх редакторів**.
+
+### Як налаштувати
+1. Відкрийте редактор Google Apps Script.
+2. Запустіть функцію `createInstallableTrigger()` **один раз** (тільки власник має це робити).
+3. Надайте дозвіл, якщо запитає.
+4. Перейдіть у меню **Тригери** (зліва) → має бути запис:
+   - Функція: `onEdit`
+   - Подія: `From spreadsheet` → `On edit`
+5. Готово! Тепер усі зміни будь-якого користувача будуть коректно записані в лог.
+
+> 🔔 Порада: Тригер можна створити вручну через меню "Тригери", якщо потрібно.
+
+---
+
 ## 📦 File Structure
 
 ```
